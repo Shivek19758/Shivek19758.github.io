@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silicon Data Sleuthing — CTF Writeup // 0xHACK</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ─── READING PROGRESS BAR ─── */
+.read-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  box-shadow: 0 0 10px rgba(0,255,157,0.8);
+  z-index: 10001;
+  transition: width 0.05s linear;
+  pointer-events: none;
+}
+
+/* ─── BLOG HERO ─── */
+.blog-hero {
+  padding: 48px 2rem 36px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.blog-hero .hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.blog-hero-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+.blog-breadcrumb {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.blog-breadcrumb a { color: var(--text-dim); text-decoration: none; }
+.blog-breadcrumb a:hover { color: var(--green); }
+.blog-breadcrumb span { margin: 0 8px; opacity: 0.35; }
+.blog-cat-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 4px;
+  opacity: 0.65;
+  margin-bottom: 14px;
+}
+.blog-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: 3px;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+.blog-title em {
+  color: var(--green);
+  font-style: normal;
+  text-shadow: 0 0 30px rgba(0,255,157,0.5);
+}
+.blog-subtitle {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+.blog-subtitle::before { content: '$ '; color: var(--green); }
+.blog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.meta-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  border: 1px solid;
+  border-radius: 2px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.meta-badge.green  { border-color: var(--green3); color: var(--green);  background: rgba(0,255,157,0.05); }
+.meta-badge.yellow { border-color: rgba(255,214,10,0.35); color: var(--yellow); background: rgba(255,214,10,0.05); }
+.meta-badge.cyan   { border-color: rgba(0,229,255,0.35); color: var(--cyan);  background: rgba(0,229,255,0.05); }
+.meta-badge.orange { border-color: rgba(255,107,53,0.35); color: var(--orange); background: rgba(255,107,53,0.05); }
+.meta-badge.purple { border-color: rgba(191,90,242,0.35); color: var(--purple); background: rgba(191,90,242,0.05); }
+.meta-sep { color: var(--text-dim); opacity: 0.25; font-family: 'Share Tech Mono', monospace; }
+
+/* ─── BLOG LAYOUT ─── */
+.blog-content { max-width: 780px; }
+.blog-content p {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14.5px;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1.9;
+  margin-bottom: 18px;
+}
+.blog-content p strong { color: var(--text-bright); font-weight: 600; }
+.blog-content p em { color: var(--green); font-style: normal; }
+.blog-content p code {
+  background: rgba(0,255,157,0.07);
+  border: 1px solid rgba(0,255,157,0.18);
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--green);
+  font-family: 'Fira Code', monospace;
+}
+
+/* ─── SECTION LABELS (dividers) ─── */
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin: 52px 0 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-label::before { content: '//'; opacity: 0.8; margin-right: 2px; }
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ─── BLOG SECTIONS ─── */
+.blog-section {
+  margin-bottom: 52px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.4s forwards;
+}
+.blog-section:nth-child(1)  { animation-delay: 0.05s; }
+.blog-section:nth-child(2)  { animation-delay: 0.10s; }
+.blog-section:nth-child(3)  { animation-delay: 0.15s; }
+.blog-section:nth-child(4)  { animation-delay: 0.20s; }
+.blog-section:nth-child(5)  { animation-delay: 0.25s; }
+.blog-section:nth-child(6)  { animation-delay: 0.30s; }
+.blog-section:nth-child(7)  { animation-delay: 0.35s; }
+.blog-section:nth-child(8)  { animation-delay: 0.40s; }
+.blog-section:nth-child(9)  { animation-delay: 0.45s; }
+.blog-section:nth-child(10) { animation-delay: 0.50s; }
+.blog-section:nth-child(11) { animation-delay: 0.55s; }
+
+/* ─── STEP HEADERS ─── */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.step-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--green);
+  color: var(--bg);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+.step-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.step-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-top: 3px;
+}
+
+/* ─── PLAIN SECTION HEADER (no step num) ─── */
+.plain-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.plain-icon {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  background: rgba(0,255,157,0.08);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.plain-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ─── SCENARIO BOX ─── */
+.scenario-box {
+  background: rgba(0,255,157,0.03);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.scenario-box::before {
+  content: '// MISSION BRIEFING';
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: var(--green);
+  letter-spacing: 3px;
+  display: block;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+/* ─── CALLOUT BOXES ─── */
+.callout {
+  padding: 14px 18px;
+  border-left: 3px solid rgba(0,229,255,0.5);
+  border-radius: 0 3px 3px 0;
+  margin: 14px 0;
+  background: rgba(0,229,255,0.04);
+  border-top: 1px solid rgba(0,229,255,0.1);
+  border-right: 1px solid rgba(0,229,255,0.1);
+  border-bottom: 1px solid rgba(0,229,255,0.1);
+}
+.callout-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  margin-bottom: 7px;
+}
+.callout p {
+  font-size: 13px !important;
+  color: var(--text-dim) !important;
+  margin: 0 !important;
+  line-height: 1.75 !important;
+}
+.callout.warn {
+  border-left-color: rgba(255,45,85,0.6);
+  border-top-color: rgba(255,45,85,0.1);
+  border-right-color: rgba(255,45,85,0.1);
+  border-bottom-color: rgba(255,45,85,0.1);
+  background: rgba(255,45,85,0.04);
+}
+.callout.warn .callout-title { color: var(--red); }
+
+/* ─── CODE LABEL ABOVE CODE BLOCKS ─── */
+.code-wrap { margin: 16px 0; }
+.code-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: var(--green2);
+  letter-spacing: 2px;
+  opacity: 0.55;
+  padding: 4px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  display: inline-block;
+  border-radius: 2px 2px 0 0;
+}
+.code-wrap pre {
+  margin: 0;
+  border-radius: 0 3px 3px 3px;
+}
+
+/* ─── FILE TREE ─── */
+.file-tree {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.9;
+  background: #020609;
+  border: 1px solid var(--border);
+  border-left: 3px solid rgba(0,229,255,0.3);
+  padding: 18px 22px;
+  margin: 14px 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+.tree-dir  { color: var(--cyan); }
+.tree-hi   { color: var(--yellow); }
+.tree-cmt  { color: var(--text-dim); opacity: 0.6; font-style: italic; }
+
+/* ─── LAYER COMPARISON TABLE ─── */
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+
+/* ─── ANSWERS BOX ─── */
+.answers-box {
+  background: #020609;
+  border: 1px solid var(--green2);
+  box-shadow: 0 0 30px rgba(0,255,157,0.06), inset 0 0 60px rgba(0,255,157,0.02);
+  padding: 28px 32px;
+  margin: 20px 0;
+}
+.answers-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 22px;
+  text-shadow: 0 0 20px rgba(0,255,157,0.4);
+}
+.answer-row {
+  display: flex;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(0,255,157,0.06);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.answer-row:last-child { border-bottom: none; }
+.answer-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  min-width: 200px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.answer-val {
+  font-family: 'Fira Code', monospace;
+  font-size: 12.5px;
+  color: var(--green);
+  word-break: break-all;
+  flex: 1;
+}
+
+/* ─── TOOL GRID ─── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.tool-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px 16px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.tool-card:hover {
+  border-color: rgba(0,255,157,0.25);
+  background: rgba(0,255,157,0.03);
+}
+.tool-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--green);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.tool-name::before { content: '> '; color: var(--text-dim); opacity: 0.5; }
+.tool-desc {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-dim);
+  line-height: 1.65;
+  margin: 0;
+}
+.tool-desc code {
+  background: rgba(0,255,157,0.07);
+  border: 1px solid rgba(0,255,157,0.15);
+  padding: 0 4px;
+  font-size: 11px;
+  color: var(--green);
+  font-family: 'Fira Code', monospace;
+}
+
+/* ─── REFERENCES ─── */
+.ref-list { margin: 14px 0; }
+.ref-item {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(15,58,46,0.4);
+  flex-wrap: wrap;
+}
+.ref-item:last-child { border-bottom: none; }
+.ref-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--green);
+  opacity: 0.45;
+  min-width: 30px;
+  padding-top: 2px;
+}
+.ref-content { flex: 1; }
+.ref-title {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.ref-content a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  text-decoration: none;
+  word-break: break-all;
+  opacity: 0.75;
+}
+.ref-content a:hover { opacity: 1; text-decoration: underline; }
+
+/* ─── SIDEBAR TOC ─── */
+.toc-divider {
+  margin: 12px 0 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .answers-box { padding: 18px 16px; }
+  .answer-label { min-width: 140px; }
+  .blog-title { font-size: 1.8rem; }
+  .file-tree { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Reading Progress Bar -->
+<div class="read-progress" id="readProgress"></div>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="logo">0x<span>HACK</span> CTF</div>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="index.html#forensics" style="color:var(--green);border-color:var(--green3);background:rgba(0,255,157,0.05)">FORENSICS</a>
+    <a href="index.html#web">WEB</a>
+    <a href="index.html#pwn">PWN</a>
+    <a href="index.html#re">REV</a>
+    <a href="index.html#crypto">CRYPTO</a>
+    <a href="index.html#network">NETWORK</a>
+  </nav>
+</header>
+
+<!-- ===== BLOG HERO ===== -->
+<div class="blog-hero">
+  <div class="hero-grid"></div>
+  <div class="blog-hero-inner">
+    <div class="blog-breadcrumb">
+      <a href="index.html">HOME</a>
+      <span>/</span>
+      WRITEUPS
+      <span>/</span>
+      <a href="index.html#forensics">FORENSICS</a>
+      <span>/</span>
+      SILICON DATA SLEUTHING
+    </div>
+    <div class="blog-cat-tag">// CTF WRITEUP &nbsp;·&nbsp; FORENSICS &nbsp;·&nbsp; FIRMWARE ANALYSIS</div>
+    <h1 class="blog-title">SILICON <em>DATA</em> SLEUTHING</h1>
+    <div class="blog-subtitle">./analyze_firmware chal_router_dump.bin</div>
+    <div class="blog-meta">
+      <span class="meta-badge green">MEDIUM DIFFICULTY</span>
+      <span class="meta-badge yellow">FORENSICS</span>
+      <span class="meta-badge cyan">OPENWRT / MIPS</span>
+      <span class="meta-sep">·</span>
+      <span class="meta-badge orange">~9 MIN READ</span>
+      <span class="meta-badge purple">2024</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+<!-- TABLE OF CONTENTS SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-title">CONTENTS</div>
+  <a href="index.html"><span class="dot" style="background:var(--text-dim)"></span> ← Cheatsheet</a>
+
+  <div class="toc-divider">
+    <div class="sidebar-title">WALKTHROUGH</div>
+  </div>
+  <a href="#intro"><span class="dot" style="background:#30d158"></span> Introduction</a>
+  <a href="#step-1"><span class="dot" style="background:#30d158"></span> 01 — Identify File</a>
+  <a href="#step-2"><span class="dot" style="background:#30d158"></span> 02 — String Analysis</a>
+  <a href="#step-3"><span class="dot" style="background:#30d158"></span> 03 — Magic Bytes</a>
+  <a href="#step-4"><span class="dot" style="background:#30d158"></span> 04 — Filesystem</a>
+  <a href="#step-5"><span class="dot" style="background:#30d158"></span> 05 — JFFS2 Overlay</a>
+  <a href="#step-6"><span class="dot" style="background:#30d158"></span> 06 — Credentials</a>
+
+  <div class="toc-divider">
+    <div class="sidebar-title">RESULTS</div>
+  </div>
+  <a href="#answers"><span class="dot" style="background:var(--green)"></span> Recovered Intel</a>
+  <a href="#tools"><span class="dot" style="background:var(--cyan)"></span> Tools Used</a>
+  <a href="#takeaways"><span class="dot" style="background:var(--yellow)"></span> Key Takeaways</a>
+  <a href="#refs"><span class="dot" style="background:var(--text-dim)"></span> References</a>
+</aside>
+
+<!-- ===== BLOG CONTENT ===== -->
+<div class="content blog-content">
+
+  <!-- ── INTRODUCTION ── -->
+  <div class="section-label">Introduction</div>
+
+  <div class="blog-section" id="intro">
+    <div class="scenario-box">
+      <p>In the dust and sand surrounding the vault, you unearth a rusty PCB. You try to read the etched print — it says <strong>Open..W...RT</strong>, a router! You hand it over to the hardware gurus and to their surprise the ROM chip is intact. They manage to read the data off the tarnished silicon and give you back a firmware image. It's now your job to examine the firmware and recover useful information that will help unlock and bypass the vault's countermeasures.</p>
+    </div>
+
+    <p>This challenge gives us a <strong>raw binary dump</strong> of a router's flash chip. Our goal is to extract version numbers, credentials, network configs, and port forwarding rules. Think of it like finding a hard drive on the street — we're going to explore every layer of what's on it.</p>
+
+    <div class="callout">
+      <div class="callout-title">// KEY CONCEPT — What is Firmware?</div>
+      <p>Firmware is the permanent software stored on a hardware chip. For a router, it contains the entire operating system, configuration files, and all user settings. When you dump a chip, you get one big binary blob containing all of this compressed and packed together.</p>
+    </div>
+  </div>
+
+  <!-- ── WALKTHROUGH ── -->
+  <div class="section-label">Step-by-Step Walkthrough</div>
+
+  <!-- STEP 1 -->
+  <div class="blog-section" id="step-1">
+    <div class="step-header">
+      <div class="step-num">01</div>
+      <div>
+        <div class="step-title">Identify the File</div>
+        <div class="step-sub">Reconnaissance — what format are we dealing with?</div>
+      </div>
+    </div>
+
+    <p>Always start by asking: <strong>what kind of file is this?</strong> The <code>file</code> command reads the first few bytes (the "magic header") and identifies the format — without relying on the filename extension at all.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">BASH</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">file</span> chal_router_dump.bin
+
+<span class="cm"># Output:</span>
+<span class="v">chal_router_dump.bin: data</span></code></pre>
+    </div>
+
+    <p>It came back as generic <em>data</em> — meaning it's a raw binary blob with no recognisable standard header. This is completely normal for flash chip dumps. The file is <strong>16 MB (0x1000000 bytes)</strong>, exactly matching the flash size of typical budget home routers.</p>
+
+    <div class="callout">
+      <div class="callout-title">// TOOL: file</div>
+      <p>The <code>file</code> command identifies file types by reading magic bytes at the start of the file, not by relying on the filename extension. It's the fastest first-look tool in your forensics toolkit — always run it first.</p>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="blog-section" id="step-2">
+    <div class="step-header">
+      <div class="step-num">02</div>
+      <div>
+        <div class="step-title">Extract Readable Strings</div>
+        <div class="step-sub">Mining plain-text data from inside the binary</div>
+      </div>
+    </div>
+
+    <p>The <code>strings</code> command pulls out any sequence of printable characters from a binary file. Even compiled, compressed code has version strings, copyright notices, error messages, and config values baked directly into it — completely in the clear.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">BASH</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">strings</span> chal_router_dump.bin | <span class="c">grep</span> <span class="f">-i</span> <span class="s">"openwrt"</span>
+
+<span class="cm"># Key output lines:</span>
+<span class="v">MIPS OpenWrt Linux-5.15.134</span>
+<span class="v">OpenWrt kernel loader for MIPS based SoC</span></code></pre>
+    </div>
+
+    <p>This immediately reveals our first answer: <strong>kernel version 5.15.134</strong>. We also learn it's a <strong>MIPS architecture</strong> device — common in budget routers using MediaTek SoCs (TP-Link, ASUS, Xiaomi budget lines).</p>
+
+    <div class="callout">
+      <div class="callout-title">// WHY DOES THIS WORK?</div>
+      <p>Compilers embed version strings, copyright notices, and debug messages as plain text into binaries even after compilation. The <code>strings</code> tool finds any run of 4+ printable ASCII characters — no decryption, no disassembly needed. One of the highest-signal, lowest-effort recon tools available.</p>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="blog-section" id="step-3">
+    <div class="step-header">
+      <div class="step-num">03</div>
+      <div>
+        <div class="step-title">Find the Filesystem — Magic Bytes</div>
+        <div class="step-sub">Locating and carving the SquashFS partition</div>
+      </div>
+    </div>
+
+    <p>Router firmware contains a <strong>compressed filesystem</strong> packed somewhere inside the binary blob. The most common format for OpenWRT is <strong>SquashFS</strong> — a read-only compressed filesystem designed specifically for embedded devices. Every binary format starts with a unique byte sequence called <em>magic bytes</em>. SquashFS uses <code>hsqs</code> (little-endian) or <code>sqsh</code> (big-endian).</p>
+
+    <p>We write a quick Python script to scan the binary and find it:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PYTHON</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Open the firmware as raw bytes</span>
+<span class="v">data</span> = <span class="c">open</span>(<span class="s">'chal_router_dump.bin'</span>, <span class="s">'rb'</span>).<span class="c">read</span>()
+
+<span class="cm"># Scan for SquashFS magic bytes (little-endian)</span>
+<span class="v">pos</span> = <span class="v">data</span>.<span class="c">find</span>(<span class="s">b'hsqs'</span>)
+<span class="c">print</span>(<span class="s">f"Found SquashFS at offset {pos} ({hex(pos)})"</span>)
+
+<span class="cm"># Output:</span>
+<span class="v">Found hsqs at offset 4375240 (0x42c2c8)</span></code></pre>
+    </div>
+
+    <p>The filesystem starts at byte <strong>4,375,240</strong> into the file. Now we carve it out using <code>dd</code> — a precision binary cutter — then extract the contents with <code>unsquashfs</code>:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">BASH</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Carve from offset to end of file (bs=1 = byte-by-byte precision)</span>
+<span class="c">dd</span> <span class="f">if</span>=chal_router_dump.bin <span class="f">of</span>=squashfs.img <span class="f">bs</span>=1 <span class="f">skip</span>=4375240
+
+<span class="cm"># Extract the entire SquashFS into a folder called 'extracted/'</span>
+<span class="c">unsquashfs</span> <span class="f">-d</span> extracted squashfs.img
+
+<span class="cm"># Output:</span>
+<span class="v">created 1010 files, 114 directories, 203 symlinks</span></code></pre>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">// NOTE: dd bs=1 is slow on large files</div>
+      <p>Using <code>bs=1 skip=N</code> copies byte-by-byte, which is accurate but slow for 16 MB files. For speed, use a larger block size with calculated skip/count values — or use <code>binwalk -e</code> which handles identification and extraction automatically.</p>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="blog-section" id="step-4">
+    <div class="step-header">
+      <div class="step-num">04</div>
+      <div>
+        <div class="step-title">Explore the Filesystem</div>
+        <div class="step-sub">Navigating the extracted Linux directory tree</div>
+      </div>
+    </div>
+
+    <p>The extracted folder is a <strong>complete Linux filesystem</strong> — identical to what's running on the physical router right now. We browse it exactly like any Linux system. Key locations to know:</p>
+
+    <div class="file-tree"><span class="tree-dir">extracted/</span>
+├── <span class="tree-dir">bin/</span>              <span class="tree-cmt">— system binaries (ls, cat, sh...)</span>
+├── <span class="tree-dir">etc/</span>              <span class="tree-hi">★  config files live here</span>
+│   ├── <span class="tree-hi">openwrt_release</span>   <span class="tree-cmt">→ OpenWRT version string</span>
+│   ├── <span class="tree-hi">shadow</span>            <span class="tree-cmt">→ password hashes (factory default)</span>
+│   ├── <span class="tree-hi">passwd</span>            <span class="tree-cmt">→ user accounts</span>
+│   └── <span class="tree-dir">config/</span>
+│       ├── <span class="tree-hi">network</span>       <span class="tree-cmt">→ IP addresses, PPPoE credentials</span>
+│       ├── <span class="tree-hi">wireless</span>      <span class="tree-cmt">→ WiFi SSID &amp; password</span>
+│       └── <span class="tree-hi">firewall</span>      <span class="tree-cmt">→ port forwarding rules</span>
+├── <span class="tree-dir">lib/modules/</span>
+│   └── <span class="tree-hi">5.15.134/</span>         <span class="tree-cmt">→ kernel version confirmed in folder name</span>
+└── <span class="tree-dir">www/</span>              <span class="tree-cmt">— LuCI web interface files</span></div>
+
+    <div class="code-wrap">
+      <div class="code-label">BASH</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">cat</span> extracted/etc/openwrt_release
+
+<span class="v">DISTRIB_ID='OpenWrt'</span>
+<span class="v">DISTRIB_RELEASE='</span><span class="k">23.05.0</span><span class="v">'</span>
+<span class="v">DISTRIB_REVISION='r23497-6637af95aa'</span>
+<span class="v">DISTRIB_TARGET='ramips/mt7621'</span>
+<span class="v">DISTRIB_ARCH='mipsel_24kc'</span></code></pre>
+    </div>
+
+    <p>Answer confirmed: <strong>OpenWRT version 23.05.0</strong>. The target <code>ramips/mt7621</code> tells us it's running on a Ralink/MediaTek MT7621 chipset — one of the most common budget router SoCs in the world.</p>
+
+    <p>Checking <code>etc/shadow</code> in the base SquashFS layer shows root with <strong>no password</strong> — but that's just the factory default image. The real, user-set credentials live in the writable overlay filesystem, covered in the next step.</p>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="blog-section" id="step-5">
+    <div class="step-header">
+      <div class="step-num">05</div>
+      <div>
+        <div class="step-title">The Hidden Layer — JFFS2 Overlay</div>
+        <div class="step-sub">Where the real user data is stored</div>
+      </div>
+    </div>
+
+    <p>This is the most critical step in the entire challenge. OpenWRT uses a <strong>two-layer filesystem architecture</strong>. Miss this layer, and you miss everything that matters.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Format</th>
+            <th>Purpose</th>
+            <th>Contains</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Base</td>
+            <td><code>SquashFS</code></td>
+            <td>Read-only factory image</td>
+            <td>Default configs, system binaries</td>
+          </tr>
+          <tr>
+            <td>Overlay</td>
+            <td><code>JFFS2</code></td>
+            <td>Writable user changes</td>
+            <td>Changed passwords, custom configs, keys</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">// COMMON MISTAKE</div>
+      <p>If you only analyse the SquashFS base layer, you'll see factory defaults — blank passwords, empty configs. The <em>actual</em> user-configured data lives entirely in the JFFS2 overlay. This is the single most common oversight when analysts do firmware triage for the first time.</p>
+    </div>
+
+    <p>We scan for the JFFS2 partition, which begins after the SquashFS data ends. JFFS2 nodes use the magic bytes <code>0x1985</code> (stored little-endian as <code>\x85\x19</code>):</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PYTHON</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># JFFS2 little-endian node magic: 0x1985</span>
+<span class="v">jffs2_magic</span> = <span class="s">b'\x85\x19'</span>
+
+<span class="cm"># Search only past where SquashFS ends</span>
+<span class="v">pos</span> = <span class="v">data</span>.<span class="c">find</span>(<span class="v">jffs2_magic</span>, after_squashfs)
+<span class="c">print</span>(<span class="s">f"JFFS2 found at {hex(pos)}"</span>)
+
+<span class="cm"># Output:</span>
+<span class="v">JFFS2 node at 0x7c0000</span></code></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">BASH</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Carve the JFFS2 partition starting at offset 0x7c0000</span>
+<span class="c">dd</span> <span class="f">if</span>=chal_router_dump.bin <span class="f">of</span>=overlay.jffs2 <span class="f">bs</span>=1 <span class="f">skip</span>=$((16#7c0000))
+
+<span class="cm"># Extract using jefferson  (pip install jefferson)</span>
+<span class="c">jefferson</span> overlay.jffs2 <span class="f">-d</span> jffs2_out
+
+<span class="cm"># The overlay stores all user changes inside a sysupgrade tarball</span>
+<span class="c">tar</span> <span class="f">-xzf</span> jffs2_out/upper/sysupgrade.tgz <span class="f">-C</span> /tmp/overlay/</code></pre>
+    </div>
+
+    <p>Now <code>/tmp/overlay/etc/</code> contains the <strong>real, live configuration files</strong> with all actual credentials. Time to read them.</p>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="blog-section" id="step-6">
+    <div class="step-header">
+      <div class="step-num">06</div>
+      <div>
+        <div class="step-title">Extracting the Credentials</div>
+        <div class="step-sub">Reading secrets from the JFFS2 overlay configs</div>
+      </div>
+    </div>
+
+    <p><strong>Root password hash</strong> — from <code>/tmp/overlay/etc/shadow</code>:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">BASH</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="c">cat</span> /tmp/overlay/etc/shadow
+
+<span class="v">root:</span><span class="k">$1$YfuRJudo$cXCiIJXn9fWLIt8WY2Okp1</span><span class="v">:19804:0:99999:7:::</span></code></pre>
+    </div>
+
+    <p>The <code>$1$</code> prefix means <strong>MD5crypt</strong> — a weak hashing algorithm by modern standards. This hash can be cracked offline using <code>hashcat</code> or <code>john the ripper</code> with a common wordlist.</p>
+
+    <p><strong>PPPoE WAN credentials</strong> — from <code>/tmp/overlay/etc/config/network</code>:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">UCI CONFIG</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>config interface <span class="s">'wan'</span>
+    option device   <span class="s">'wan'</span>
+    option proto    <span class="s">'pppoe'</span>
+    option username <span class="k">'yohZ5ah'</span>
+    option password <span class="k">'ae-h+i$i^Ngohroorie!bieng6kee7oh'</span>
+    option ipv6     <span class="s">'auto'</span></code></pre>
+    </div>
+
+    <p><strong>WiFi configuration</strong> — from <code>/tmp/overlay/etc/config/wireless</code>:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">UCI CONFIG</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>config wifi-iface <span class="s">'default_radio0'</span>
+    option ssid       <span class="k">'VLT-AP01'</span>
+    option encryption <span class="s">'sae-mixed'</span>   <span class="cm"># WPA3/WPA2</span>
+    option key        <span class="k">'french-halves-vehicular-favorable'</span></code></pre>
+    </div>
+
+    <p><strong>Port forwarding rules</strong> — from <code>/tmp/overlay/etc/config/firewall</code>:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">UCI CONFIG</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>config redirect          <span class="cm"># Database server</span>
+    option src_dport <span class="k">'1778'</span>  →  192.168.1.184:5881
+
+config redirect          <span class="cm"># Web server</span>
+    option src_dport <span class="k">'2289'</span>  →  192.168.1.119:9889
+
+config redirect          <span class="cm"># NAS / storage</span>
+    option src_dport <span class="k">'8088'</span>  →  192.168.1.166:4431</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">// REAL-WORLD IMPLICATION</div>
+      <p>PPPoE passwords, WiFi keys, and other secrets are stored as <strong>unencrypted plaintext</strong> in UCI config files. This is a genuine real-world risk — physical access to a router means full credential recovery. No soldering required if the bootloader is accessible via the serial console.</p>
+    </div>
+  </div>
+
+  <!-- ── ANSWERS ── -->
+  <div class="section-label">Recovered Intelligence</div>
+
+  <div class="blog-section" id="answers">
+    <div class="plain-header">
+      <div class="plain-icon">🏆</div>
+      <div class="plain-title">Final Answers</div>
+    </div>
+
+    <div class="answers-box">
+      <div class="answers-title">// RECOVERED INTELLIGENCE</div>
+
+      <div class="answer-row">
+        <div class="answer-label">OpenWRT Version</div>
+        <div class="answer-val">23.05.0</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">Linux Kernel Version</div>
+        <div class="answer-val">5.15.134</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">Root Shadow Line</div>
+        <div class="answer-val">root:$1$YfuRJudo$cXCiIJXn9fWLIt8WY2Okp1:19804:0:99999:7:::</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">PPPoE Username</div>
+        <div class="answer-val">yohZ5ah</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">PPPoE Password</div>
+        <div class="answer-val">ae-h+i$i^Ngohroorie!bieng6kee7oh</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">WiFi SSID</div>
+        <div class="answer-val">VLT-AP01</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">WiFi Password</div>
+        <div class="answer-val">french-halves-vehicular-favorable</div>
+      </div>
+      <div class="answer-row">
+        <div class="answer-label">WAN Redirect Ports</div>
+        <div class="answer-val">1778, 2289, 8088</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOOLS ── -->
+  <div class="section-label">Tools Used</div>
+
+  <div class="blog-section" id="tools">
+    <div class="plain-header">
+      <div class="plain-icon">🔧</div>
+      <div class="plain-title">Tools Used</div>
+    </div>
+
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-name">strings</div>
+        <p class="tool-desc">Extracts printable text sequences from any binary. Built into Linux/macOS. Fastest first-recon tool for firmware analysis.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name">Python 3</div>
+        <p class="tool-desc">Used to scan for magic bytes at arbitrary binary offsets — far more flexible than <code>grep</code> for raw binary data.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name">dd</div>
+        <p class="tool-desc">Unix block-level copy utility. Used to carve the SquashFS and JFFS2 partitions from precise byte offsets in the firmware blob.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name">unsquashfs</div>
+        <p class="tool-desc">Part of the <code>squashfs-tools</code> package. Decompresses and extracts SquashFS filesystem images into a browsable directory tree.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name">jefferson</div>
+        <p class="tool-desc">Python-based JFFS2 filesystem extractor. Install via <code>pip install jefferson</code>. Essential for reading OpenWRT overlay partitions.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-name">tar</div>
+        <p class="tool-desc">Standard archive tool. Used to unpack the <code>sysupgrade.tgz</code> tarball that wraps the JFFS2 overlay's user config files.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAKEAWAYS ── -->
+  <div class="section-label">Key Takeaways</div>
+
+  <div class="blog-section" id="takeaways">
+    <div class="plain-header">
+      <div class="plain-icon">💡</div>
+      <div class="plain-title">Key Takeaways</div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">01 — Firmware is just a file</div>
+      <p>A chip dump is a regular binary file. You can search it, slice it, and extract filesystems from it using standard Linux tools — no special hardware needed once you have the dump. Everything is accessible at the byte level.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">02 — Magic bytes reveal structure</div>
+      <p>Every embedded format (SquashFS, JFFS2, gzip, U-Boot, etc.) starts with a unique byte signature. Scanning for these tells you exactly where each partition begins — no partition table needed.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">03 — Always check the overlay</div>
+      <p>OpenWRT and many embedded Linux systems use a layered filesystem (OverlayFS). The base SquashFS layer has factory defaults; the JFFS2 overlay has real user data. Missing the overlay means missing passwords, custom configs, and keys.</p>
+    </div>
+    <div class="callout warn">
+      <div class="callout-title">04 — Configs store credentials in plaintext</div>
+      <p>PPPoE passwords, WiFi keys, and other secrets are stored as <strong>unencrypted plaintext</strong> in UCI config files. This is a genuine real-world security risk. Physical access to a router — or a firmware dump — means full credential recovery with zero cracking required.</p>
+    </div>
+  </div>
+
+  <!-- ── REFERENCES ── -->
+  <div class="section-label">References</div>
+
+  <div class="blog-section" id="refs">
+    <div class="plain-header">
+      <div class="plain-icon">📚</div>
+      <div class="plain-title">References</div>
+    </div>
+
+    <div class="ref-list">
+      <div class="ref-item">
+        <div class="ref-num">[01]</div>
+        <div class="ref-content">
+          <div class="ref-title">OpenWRT Official Documentation</div>
+          <a href="https://openwrt.org/docs/start" target="_blank" rel="noopener">https://openwrt.org/docs/start</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[02]</div>
+        <div class="ref-content">
+          <div class="ref-title">OpenWRT Filesystem &amp; Flash Layout</div>
+          <a href="https://openwrt.org/docs/techref/flash.layout" target="_blank" rel="noopener">https://openwrt.org/docs/techref/flash.layout</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[03]</div>
+        <div class="ref-content">
+          <div class="ref-title">SquashFS Documentation (kernel.org)</div>
+          <a href="https://www.kernel.org/doc/html/latest/filesystems/squashfs.html" target="_blank" rel="noopener">https://www.kernel.org/doc/html/latest/filesystems/squashfs.html</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[04]</div>
+        <div class="ref-content">
+          <div class="ref-title">JFFS2 — The Journalling Flash File System v2</div>
+          <a href="https://sourceware.org/jffs2/" target="_blank" rel="noopener">https://sourceware.org/jffs2/</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[05]</div>
+        <div class="ref-content">
+          <div class="ref-title">jefferson — JFFS2 Filesystem Extractor (GitHub)</div>
+          <a href="https://github.com/sviehb/jefferson" target="_blank" rel="noopener">https://github.com/sviehb/jefferson</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[06]</div>
+        <div class="ref-content">
+          <div class="ref-title">squashfs-tools (unsquashfs) — GitHub</div>
+          <a href="https://github.com/plougher/squashfs-tools" target="_blank" rel="noopener">https://github.com/plougher/squashfs-tools</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[07]</div>
+        <div class="ref-content">
+          <div class="ref-title">OpenWRT UCI Configuration System</div>
+          <a href="https://openwrt.org/docs/guide-user/base-system/uci" target="_blank" rel="noopener">https://openwrt.org/docs/guide-user/base-system/uci</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[08]</div>
+        <div class="ref-content">
+          <div class="ref-title">Linux /etc/shadow File Format — man page</div>
+          <a href="https://man7.org/linux/man-pages/man5/shadow.5.html" target="_blank" rel="noopener">https://man7.org/linux/man-pages/man5/shadow.5.html</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[09]</div>
+        <div class="ref-content">
+          <div class="ref-title">MTD Subsystem — Linux Flash Memory Interface</div>
+          <a href="https://www.linux-mtd.infradead.org/doc/general.html" target="_blank" rel="noopener">https://www.linux-mtd.infradead.org/doc/general.html</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[10]</div>
+        <div class="ref-content">
+          <div class="ref-title">OpenWRT Overlay Filesystem Explained</div>
+          <a href="https://openwrt.org/docs/techref/filesystems" target="_blank" rel="noopener">https://openwrt.org/docs/techref/filesystems</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[11]</div>
+        <div class="ref-content">
+          <div class="ref-title">PPPoE Protocol — RFC 2516</div>
+          <a href="https://datatracker.ietf.org/doc/html/rfc2516" target="_blank" rel="noopener">https://datatracker.ietf.org/doc/html/rfc2516</a>
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-num">[12]</div>
+        <div class="ref-content">
+          <div class="ref-title">File Magic Numbers / Signatures Database</div>
+          <a href="https://www.garykessler.net/library/file_sigs.html" target="_blank" rel="noopener">https://www.garykessler.net/library/file_sigs.html</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .blog-content -->
+</main>
+
+<button class="back-to-top" id="backToTop">↑</button>
+
+<footer>
+  Silicon Data Sleuthing — CTF Writeup
+  &nbsp;·&nbsp;
+  <span style="color:var(--green)">0xHACK CTF</span>
+  &nbsp;·&nbsp;
+  <a href="index.html" style="color:var(--text-dim);text-decoration:none">← Back to Cheatsheet</a>
+</footer>
+
+<script src="script.js"></script>
+<script>
+// ── READING PROGRESS BAR ──
+(function () {
+  const bar = document.getElementById('readProgress');
+  if (!bar) return;
+  window.addEventListener('scroll', function () {
+    const total = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+  }, { passive: true });
+})();
+
+// ── TOC ACTIVE HIGHLIGHT ──
+(function () {
+  const sections  = document.querySelectorAll('.blog-section');
+  const tocLinks  = document.querySelectorAll('.sidebar a[href^="#"]');
+
+  const obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        tocLinks.forEach(function (link) {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-15% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(function (s) { obs.observe(s); });
+})();
+</script>
+</body>
+</html>
