@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writeups // 0xHACK CTF</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+
+/* ─── WRITEUPS CONTAINER ─── */
+.writeups-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+}
+
+/* ─── FILTER BAR ─── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  margin-right: 4px;
+}
+
+.filter-btn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn:hover {
+  color: var(--green);
+  border-color: var(--green3);
+  background: rgba(0,255,157,0.04);
+}
+.filter-btn.active {
+  color: var(--green);
+  border-color: var(--green3);
+  background: rgba(0,255,157,0.07);
+}
+
+/* ─── WRITEUPS GRID ─── */
+.writeups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+/* ─── WRITEUP CARD ─── */
+.writeup-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+  opacity: 0;
+  animation: fadeUp 0.4s forwards;
+}
+.writeup-card:nth-child(1) { animation-delay: 0.05s; }
+.writeup-card:nth-child(2) { animation-delay: 0.10s; }
+.writeup-card:nth-child(3) { animation-delay: 0.15s; }
+.writeup-card:nth-child(4) { animation-delay: 0.20s; }
+
+.writeup-card:hover { transform: translateY(-5px); }
+
+.writeup-card[data-category="FORENSICS"]:hover { border-color: rgba(48,209,88,0.35);  box-shadow: 0 16px 50px rgba(48,209,88,0.07); }
+.writeup-card[data-category="PWN"]:hover        { border-color: rgba(255,69,58,0.35);  box-shadow: 0 16px 50px rgba(255,69,58,0.07); }
+.writeup-card[data-category="WEB"]:hover        { border-color: rgba(10,132,255,0.35); box-shadow: 0 16px 50px rgba(10,132,255,0.07); }
+.writeup-card[data-category="CRYPTO"]:hover     { border-color: rgba(255,214,10,0.35); box-shadow: 0 16px 50px rgba(255,214,10,0.07); }
+.writeup-card[data-category="RE"]:hover         { border-color: rgba(191,90,242,0.35); box-shadow: 0 16px 50px rgba(191,90,242,0.07); }
+
+/* Card header band */
+.wc-header {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid;
+}
+.wc-header.forensics { background: rgba(48,209,88,0.08);  border-color: rgba(48,209,88,0.15); }
+.wc-header.pwn       { background: rgba(255,69,58,0.08);  border-color: rgba(255,69,58,0.15); }
+.wc-header.web       { background: rgba(10,132,255,0.08); border-color: rgba(10,132,255,0.15); }
+.wc-header.crypto    { background: rgba(255,214,10,0.08); border-color: rgba(255,214,10,0.15); }
+.wc-header.re        { background: rgba(191,90,242,0.08); border-color: rgba(191,90,242,0.15); }
+
+.wc-cat {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+.forensics .wc-cat { color: #30d158; }
+.pwn       .wc-cat { color: #ff453a; }
+.web       .wc-cat { color: #0a84ff; }
+.crypto    .wc-cat { color: #ffd60a; }
+.re        .wc-cat { color: #bf5af2; }
+
+.wc-diff {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 2px;
+}
+.wc-diff.easy   { color: #30d158; border-color: rgba(48,209,88,0.4); }
+.wc-diff.medium { color: var(--yellow); border-color: rgba(255,214,10,0.4); }
+.wc-diff.hard   { color: var(--red); border-color: rgba(255,45,85,0.4); }
+
+/* Card body */
+.wc-body {
+  padding: 20px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+}
+
+.wc-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 1.5px;
+  line-height: 1.3;
+}
+
+.wc-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1.5px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.wc-meta span { opacity: 0.6; }
+.wc-meta span:nth-child(even) { opacity: 0.25; }
+
+.wc-desc {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-dim);
+  line-height: 1.8;
+  flex: 1;
+}
+
+.wc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.wc-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  padding: 2px 7px;
+  background: rgba(0,255,157,0.04);
+  border: 1px solid rgba(0,255,157,0.12);
+  color: var(--text-dim);
+  border-radius: 2px;
+}
+
+.wc-cta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--green);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: gap 0.2s;
+  margin-top: 4px;
+}
+.writeup-card:hover .wc-cta { gap: 12px; }
+
+/* ─── COMING SOON PLACEHOLDER ─── */
+.wc-placeholder {
+  background: var(--bg2);
+  border: 1px dashed rgba(0,255,157,0.1);
+  border-radius: 4px;
+  padding: 36px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+}
+.wc-placeholder-icon {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 22px;
+  color: var(--text-dim);
+  opacity: 0.2;
+}
+.wc-placeholder-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  opacity: 0.35;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  .writeups-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">0x<span>HACK</span> CTF</div>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="cheatsheet.html">CHEATSHEET</a>
+    <a href="writeups.html" style="color:var(--green);border-color:var(--green3);background:rgba(0,255,157,0.05)">WRITEUPS</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <h1>CTF <em>WRITEUPS</em></h1>
+  <p>// STEP-BY-STEP WALKTHROUGHS — FORENSICS · FIRMWARE · NETWORK · RE · CRYPTO</p>
+</div>
+
+<!-- WRITEUPS -->
+<div class="writeups-container">
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <span class="filter-label">FILTER</span>
+    <button class="filter-btn active" onclick="filterCards('ALL', this)">ALL</button>
+    <button class="filter-btn" onclick="filterCards('FORENSICS', this)">FORENSICS</button>
+    <button class="filter-btn" onclick="filterCards('PWN', this)">PWN</button>
+    <button class="filter-btn" onclick="filterCards('WEB', this)">WEB</button>
+    <button class="filter-btn" onclick="filterCards('CRYPTO', this)">CRYPTO</button>
+    <button class="filter-btn" onclick="filterCards('RE', this)">RE</button>
+  </div>
+
+  <!-- Grid -->
+  <div class="writeups-grid">
+
+    <!-- CARD: Silicon Data Sleuthing -->
+    <a href="silicon-data-sleuthing.html" class="writeup-card" data-category="FORENSICS">
+      <div class="wc-header forensics">
+        <span class="wc-cat">FORENSICS</span>
+        <span class="wc-diff medium">MEDIUM</span>
+      </div>
+      <div class="wc-body">
+        <div class="wc-title">Silicon Data Sleuthing</div>
+        <div class="wc-meta">
+          <span>~9 MIN READ</span>
+          <span>·</span>
+          <span>2024</span>
+          <span>·</span>
+          <span>OPENWRT / MIPS</span>
+        </div>
+        <p class="wc-desc">Analyze a 16 MB raw router flash dump to extract credentials, WiFi keys, and port forwarding rules. Covers SquashFS extraction, JFFS2 overlay forensics, and UCI config parsing.</p>
+        <div class="wc-tags">
+          <span class="wc-tag">FIRMWARE</span>
+          <span class="wc-tag">OPENWRT</span>
+          <span class="wc-tag">SQUASHFS</span>
+          <span class="wc-tag">JFFS2</span>
+          <span class="wc-tag">MIPS</span>
+        </div>
+        <div class="wc-cta">READ WRITEUP →</div>
+      </div>
+    </a>
+
+    <!-- PLACEHOLDER -->
+    <div class="wc-placeholder">
+      <div class="wc-placeholder-icon">+</div>
+      <div class="wc-placeholder-text">MORE WRITEUPS COMING SOON</div>
+    </div>
+
+  </div>
+</div>
+
+<button class="back-to-top" id="backToTop">↑</button>
+
+<footer>
+  0xHACK CTF — Writeups
+  &nbsp;·&nbsp;
+  <a href="index.html" style="color:var(--text-dim);text-decoration:none">← Home</a>
+</footer>
+
+<script src="script.js"></script>
+<script>
+function filterCards(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.writeup-card').forEach(function(card) {
+    card.style.display = (cat === 'ALL' || card.dataset.category === cat) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
