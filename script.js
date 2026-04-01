@@ -12,7 +12,6 @@ function copyCode(btn) {
     btn.style.color = 'var(--accent)';
     setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 1500);
   }).catch(() => {
-    // Fallback for older browsers / insecure contexts
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -37,7 +36,6 @@ function copyCode(btn) {
 let searchTimeout = null;
 
 function search(query) {
-  // Debounce rapid typing
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => performSearch(query), 150);
 }
@@ -45,7 +43,6 @@ function search(query) {
 function performSearch(query) {
   const searchCount = document.getElementById('searchCount');
 
-  // Reset if empty
   if (!query) {
     document.querySelectorAll('.card').forEach(c => c.style.display = '');
     document.querySelectorAll('mark').forEach(m => {
@@ -74,7 +71,6 @@ function performSearch(query) {
     section.style.display = sectionVisible ? '' : 'none';
   });
 
-  // Show result count
   if (searchCount) {
     searchCount.textContent = matchCount > 0
       ? `${matchCount} card${matchCount !== 1 ? 's' : ''} found`
@@ -82,15 +78,21 @@ function performSearch(query) {
   }
 }
 
-// ===== SIDEBAR ACTIVE HIGHLIGHT ON SCROLL =====
+// ===== HOTBAR + SIDEBAR ACTIVE HIGHLIGHT ON SCROLL =====
 const sections = document.querySelectorAll('.section');
 const sidebarLinks = document.querySelectorAll('.sidebar a');
+const hotbarLinks = document.querySelectorAll('.hotbar-item');
 
 const scrollObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const id = entry.target.getAttribute('id');
+      // Sidebar (writeup pages)
       sidebarLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+      });
+      // Hotbar (cheatsheet page)
+      hotbarLinks.forEach(link => {
         link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
       });
     }
@@ -118,7 +120,6 @@ sections.forEach(section => scrollObserver.observe(section));
 
 // ===== KEYBOARD SHORTCUTS =====
 document.addEventListener('keydown', (e) => {
-  // Ctrl/Cmd + K  or  /  → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
     const input = document.getElementById('searchInput');
@@ -129,7 +130,6 @@ document.addEventListener('keydown', (e) => {
     const input = document.getElementById('searchInput');
     if (input) input.focus();
   }
-  // Escape → clear search + blur
   if (e.key === 'Escape') {
     const input = document.getElementById('searchInput');
     if (input && document.activeElement === input) {
@@ -151,39 +151,16 @@ document.addEventListener('keydown', (e) => {
   });
 })();
 
-// ===== SMOOTH SCROLL OFFSET FOR STICKY HEADER =====
+// ===== SMOOTH SCROLL OFFSET FOR STICKY HEADER + HOTBAR =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function(e) {
     const target = document.querySelector(this.getAttribute('href'));
     if (target) {
       e.preventDefault();
-      const offset = 70; // header height + padding
+      const hotbar = document.getElementById('hotbar');
+      const offset = hotbar ? 56 + hotbar.offsetHeight + 16 : 70;
       const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
       window.scrollTo({ top, behavior: 'smooth' });
     }
   });
 });
-
-// ===== NAV LINK ACTIVE STATE =====
-const navLinks = document.querySelectorAll('nav a');
-const navObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.getAttribute('id');
-      navLinks.forEach(link => {
-        if (link.getAttribute('href') === `#${id}`) {
-          link.style.color = 'var(--accent)';
-          link.style.borderColor = 'var(--accent)';
-        } else {
-          link.style.color = '';
-          link.style.borderColor = '';
-        }
-      });
-    }
-  });
-}, {
-  rootMargin: '-20% 0px -60% 0px',
-  threshold: 0
-});
-
-sections.forEach(section => navObserver.observe(section));
