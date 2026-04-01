@@ -1,5 +1,5 @@
 /* ===================================================
-   CTF CHEATSHEET // 0xHACK — Scripts
+   CTF CHEATSHEET // 0xh1tm4n — Scripts
    =================================================== */
 
 // ===== COPY BUTTON =====
@@ -9,7 +9,7 @@ function copyCode(btn) {
   const text = code.innerText;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'DONE';
-    btn.style.color = 'var(--green)';
+    btn.style.color = 'var(--accent)';
     setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 1500);
   }).catch(() => {
     // Fallback for older browsers / insecure contexts
@@ -22,7 +22,7 @@ function copyCode(btn) {
     try {
       document.execCommand('copy');
       btn.textContent = 'DONE';
-      btn.style.color = 'var(--green)';
+      btn.style.color = 'var(--accent)';
       setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 1500);
     } catch (e) {
       btn.textContent = 'FAIL';
@@ -172,8 +172,8 @@ const navObserver = new IntersectionObserver((entries) => {
       const id = entry.target.getAttribute('id');
       navLinks.forEach(link => {
         if (link.getAttribute('href') === `#${id}`) {
-          link.style.color = 'var(--green)';
-          link.style.borderColor = 'var(--green3)';
+          link.style.color = 'var(--accent)';
+          link.style.borderColor = 'var(--accent)';
         } else {
           link.style.color = '';
           link.style.borderColor = '';

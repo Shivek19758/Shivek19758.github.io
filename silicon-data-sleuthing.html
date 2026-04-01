@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Silicon Data Sleuthing — CTF Writeup // 0xHACK</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<title>Silicon Data Sleuthing — CTF Writeup // 0xh1tm4n</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fira+Code:wght@300;400;500&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
 /* ─── READING PROGRESS BAR ─── */
@@ -13,8 +13,7 @@
   top: 0; left: 0;
   height: 2px;
   width: 0%;
-  background: linear-gradient(90deg, var(--green), var(--cyan));
-  box-shadow: 0 0 10px rgba(0,255,157,0.8);
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
   z-index: 10001;
   transition: width 0.05s linear;
   pointer-events: none;
@@ -31,8 +30,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
 }
@@ -42,36 +41,35 @@
   position: relative;
 }
 .blog-breadcrumb {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
   color: var(--text-dim);
   letter-spacing: 2px;
   margin-bottom: 20px;
 }
 .blog-breadcrumb a { color: var(--text-dim); text-decoration: none; }
-.blog-breadcrumb a:hover { color: var(--green); }
+.blog-breadcrumb a:hover { color: var(--accent); }
 .blog-breadcrumb span { margin: 0 8px; opacity: 0.35; }
 .blog-cat-tag {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 4px;
   opacity: 0.65;
   margin-bottom: 14px;
 }
 .blog-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Space Mono', 'Fira Code', monospace;
   font-size: clamp(1.8rem, 5vw, 3.2rem);
-  font-weight: 900;
+  font-weight: 700;
   color: var(--text-bright);
   letter-spacing: 3px;
   line-height: 1.1;
   margin-bottom: 10px;
 }
 .blog-title em {
-  color: var(--green);
+  color: var(--accent);
   font-style: normal;
-  text-shadow: 0 0 30px rgba(0,255,157,0.5);
 }
 .blog-subtitle {
   font-family: 'Fira Code', monospace;
@@ -80,7 +78,7 @@
   margin-bottom: 24px;
   letter-spacing: 1px;
 }
-.blog-subtitle::before { content: '$ '; color: var(--green); }
+.blog-subtitle::before { content: '$ '; color: var(--accent); }
 .blog-meta {
   display: flex;
   flex-wrap: wrap;
@@ -88,7 +86,7 @@
   align-items: center;
 }
 .meta-badge {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
   padding: 3px 10px;
   border: 1px solid;
@@ -96,12 +94,12 @@
   letter-spacing: 2px;
   text-transform: uppercase;
 }
-.meta-badge.green  { border-color: var(--green3); color: var(--green);  background: rgba(0,255,157,0.05); }
-.meta-badge.yellow { border-color: rgba(255,214,10,0.35); color: var(--yellow); background: rgba(255,214,10,0.05); }
-.meta-badge.cyan   { border-color: rgba(0,229,255,0.35); color: var(--cyan);  background: rgba(0,229,255,0.05); }
-.meta-badge.orange { border-color: rgba(255,107,53,0.35); color: var(--orange); background: rgba(255,107,53,0.05); }
-.meta-badge.purple { border-color: rgba(191,90,242,0.35); color: var(--purple); background: rgba(191,90,242,0.05); }
-.meta-sep { color: var(--text-dim); opacity: 0.25; font-family: 'Share Tech Mono', monospace; }
+.meta-badge.green  { border-color: #86efac; color: #16a34a; background: #f0fdf4; }
+.meta-badge.yellow { border-color: #fde047; color: #ca8a04; background: #fefce8; }
+.meta-badge.cyan   { border-color: #67e8f9; color: #0891b2; background: #ecfeff; }
+.meta-badge.orange { border-color: #fdba74; color: #ea580c; background: #fff7ed; }
+.meta-badge.purple { border-color: #c4b5fd; color: #7c3aed; background: #f5f3ff; }
+.meta-sep { color: var(--text-dim); opacity: 0.25; font-family: 'Fira Code', monospace; }
 
 /* ─── BLOG LAYOUT ─── */
 .blog-content { max-width: 780px; }
@@ -114,22 +112,22 @@
   margin-bottom: 18px;
 }
 .blog-content p strong { color: var(--text-bright); font-weight: 600; }
-.blog-content p em { color: var(--green); font-style: normal; }
+.blog-content p em { color: var(--accent); font-style: normal; }
 .blog-content p code {
-  background: rgba(0,255,157,0.07);
-  border: 1px solid rgba(0,255,157,0.18);
+  background: var(--bg3);
+  border: 1px solid var(--border);
   padding: 1px 6px;
   border-radius: 2px;
   font-size: 12px;
-  color: var(--green);
+  color: var(--accent);
   font-family: 'Fira Code', monospace;
 }
 
 /* ─── SECTION LABELS (dividers) ─── */
 .section-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 4px;
   text-transform: uppercase;
   opacity: 0.45;
@@ -175,11 +173,11 @@
   border-bottom: 1px solid var(--border);
 }
 .step-num {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Space Mono', 'Fira Code', monospace;
   font-size: 10px;
   font-weight: 700;
-  background: var(--green);
-  color: var(--bg);
+  background: var(--accent);
+  color: #fff;
   width: 34px;
   height: 34px;
   display: flex;
@@ -190,15 +188,15 @@
   letter-spacing: 1px;
 }
 .step-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Space Mono', 'Fira Code', monospace;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 .step-sub {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
   color: var(--text-dim);
   letter-spacing: 1px;
@@ -218,33 +216,33 @@
   width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
   font-size: 16px;
-  background: rgba(0,255,157,0.08);
+  background: var(--accent-bg);
   border-radius: 2px;
   flex-shrink: 0;
 }
 .plain-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Space Mono', 'Fira Code', monospace;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 /* ─── SCENARIO BOX ─── */
 .scenario-box {
-  background: rgba(0,255,157,0.03);
+  background: var(--accent-bg);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--green);
+  border-left: 3px solid var(--accent);
   padding: 20px 24px;
   margin-bottom: 20px;
   position: relative;
 }
 .scenario-box::before {
   content: '// MISSION BRIEFING';
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 9px;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 3px;
   display: block;
   margin-bottom: 10px;
@@ -254,16 +252,16 @@
 /* ─── CALLOUT BOXES ─── */
 .callout {
   padding: 14px 18px;
-  border-left: 3px solid rgba(0,229,255,0.5);
+  border-left: 3px solid var(--cyan);
   border-radius: 0 3px 3px 0;
   margin: 14px 0;
-  background: rgba(0,229,255,0.04);
-  border-top: 1px solid rgba(0,229,255,0.1);
-  border-right: 1px solid rgba(0,229,255,0.1);
-  border-bottom: 1px solid rgba(0,229,255,0.1);
+  background: #ecfeff;
+  border-top: 1px solid #cffafe;
+  border-right: 1px solid #cffafe;
+  border-bottom: 1px solid #cffafe;
 }
 .callout-title {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 10px;
   color: var(--cyan);
   letter-spacing: 2px;
@@ -276,22 +274,22 @@
   line-height: 1.75 !important;
 }
 .callout.warn {
-  border-left-color: rgba(255,45,85,0.6);
-  border-top-color: rgba(255,45,85,0.1);
-  border-right-color: rgba(255,45,85,0.1);
-  border-bottom-color: rgba(255,45,85,0.1);
-  background: rgba(255,45,85,0.04);
+  border-left-color: var(--red);
+  border-top-color: #fecaca;
+  border-right-color: #fecaca;
+  border-bottom-color: #fecaca;
+  background: #fef2f2;
 }
 .callout.warn .callout-title { color: var(--red); }
 
 /* ─── CODE LABEL ABOVE CODE BLOCKS ─── */
 .code-wrap { margin: 16px 0; }
 .code-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 9px;
-  color: var(--green2);
+  color: var(--text-dim);
   letter-spacing: 2px;
-  opacity: 0.55;
+  opacity: 0.7;
   padding: 4px 12px;
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -309,16 +307,16 @@
   font-family: 'Fira Code', monospace;
   font-size: 12px;
   line-height: 1.9;
-  background: #020609;
+  background: #f0ede6;
   border: 1px solid var(--border);
-  border-left: 3px solid rgba(0,229,255,0.3);
+  border-left: 3px solid var(--cyan);
   padding: 18px 22px;
   margin: 14px 0;
   overflow-x: auto;
   white-space: pre;
 }
-.tree-dir  { color: var(--cyan); }
-.tree-hi   { color: var(--yellow); }
+.tree-dir  { color: #0891b2; }
+.tree-hi   { color: #ca8a04; }
 .tree-cmt  { color: var(--text-dim); opacity: 0.6; font-style: italic; }
 
 /* ─── LAYER COMPARISON TABLE ─── */
@@ -326,33 +324,33 @@
 
 /* ─── ANSWERS BOX ─── */
 .answers-box {
-  background: #020609;
-  border: 1px solid var(--green2);
-  box-shadow: 0 0 30px rgba(0,255,157,0.06), inset 0 0 60px rgba(0,255,157,0.02);
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
   padding: 28px 32px;
   margin: 20px 0;
+  border-radius: 6px;
 }
 .answers-title {
-  font-family: 'Orbitron', monospace;
+  font-family: 'Space Mono', 'Fira Code', monospace;
   font-size: 11px;
   font-weight: 700;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: 4px;
   text-align: center;
   margin-bottom: 22px;
-  text-shadow: 0 0 20px rgba(0,255,157,0.4);
 }
 .answer-row {
   display: flex;
   gap: 16px;
   padding: 11px 0;
-  border-bottom: 1px solid rgba(0,255,157,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   align-items: flex-start;
   flex-wrap: wrap;
 }
 .answer-row:last-child { border-bottom: none; }
 .answer-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 11px;
   color: var(--text-dim);
   letter-spacing: 1px;
@@ -363,7 +361,7 @@
 .answer-val {
   font-family: 'Fira Code', monospace;
   font-size: 12.5px;
-  color: var(--green);
+  color: var(--accent);
   word-break: break-all;
   flex: 1;
 }
@@ -378,18 +376,19 @@
 .tool-card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 6px;
   padding: 14px 16px;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 .tool-card:hover {
-  border-color: rgba(0,255,157,0.25);
-  background: rgba(0,255,157,0.03);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .tool-name {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 13px;
-  color: var(--green);
+  color: var(--accent);
   margin-bottom: 6px;
   letter-spacing: 1px;
 }
@@ -403,11 +402,11 @@
   margin: 0;
 }
 .tool-desc code {
-  background: rgba(0,255,157,0.07);
-  border: 1px solid rgba(0,255,157,0.15);
+  background: var(--bg3);
+  border: 1px solid var(--border);
   padding: 0 4px;
   font-size: 11px;
-  color: var(--green);
+  color: var(--accent);
   font-family: 'Fira Code', monospace;
 }
 
@@ -417,14 +416,14 @@
   display: flex;
   gap: 14px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(15,58,46,0.4);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   flex-wrap: wrap;
 }
 .ref-item:last-child { border-bottom: none; }
 .ref-num {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 11px;
-  color: var(--green);
+  color: var(--accent);
   opacity: 0.45;
   min-width: 30px;
   padding-top: 2px;
@@ -438,7 +437,7 @@
   margin-bottom: 3px;
 }
 .ref-content a {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: 'Fira Code', monospace;
   font-size: 11px;
   color: var(--cyan);
   text-decoration: none;
@@ -470,10 +469,10 @@
 
 <!-- ===== HEADER ===== -->
 <header>
-  <div class="logo">0x<span>HACK</span> CTF</div>
+  <div class="logo">0x<span>h1tm4n</span></div>
   <nav>
     <a href="index.html">HOME</a>
-    <a href="cheatsheet.html#forensics" style="color:var(--green);border-color:var(--green3);background:rgba(0,255,157,0.05)">FORENSICS</a>
+    <a href="cheatsheet.html#forensics" style="color:var(--accent);border-color:var(--accent);background:var(--accent-bg)">FORENSICS</a>
     <a href="cheatsheet.html#web">WEB</a>
     <a href="cheatsheet.html#pwn">PWN</a>
     <a href="cheatsheet.html#re">REV</a>
@@ -520,18 +519,18 @@
   <div class="toc-divider">
     <div class="sidebar-title">WALKTHROUGH</div>
   </div>
-  <a href="#intro"><span class="dot" style="background:#30d158"></span> Introduction</a>
-  <a href="#step-1"><span class="dot" style="background:#30d158"></span> 01 — Identify File</a>
-  <a href="#step-2"><span class="dot" style="background:#30d158"></span> 02 — String Analysis</a>
-  <a href="#step-3"><span class="dot" style="background:#30d158"></span> 03 — Magic Bytes</a>
-  <a href="#step-4"><span class="dot" style="background:#30d158"></span> 04 — Filesystem</a>
-  <a href="#step-5"><span class="dot" style="background:#30d158"></span> 05 — JFFS2 Overlay</a>
-  <a href="#step-6"><span class="dot" style="background:#30d158"></span> 06 — Credentials</a>
+  <a href="#intro"><span class="dot" style="background:#16a34a"></span> Introduction</a>
+  <a href="#step-1"><span class="dot" style="background:#16a34a"></span> 01 — Identify File</a>
+  <a href="#step-2"><span class="dot" style="background:#16a34a"></span> 02 — String Analysis</a>
+  <a href="#step-3"><span class="dot" style="background:#16a34a"></span> 03 — Magic Bytes</a>
+  <a href="#step-4"><span class="dot" style="background:#16a34a"></span> 04 — Filesystem</a>
+  <a href="#step-5"><span class="dot" style="background:#16a34a"></span> 05 — JFFS2 Overlay</a>
+  <a href="#step-6"><span class="dot" style="background:#16a34a"></span> 06 — Credentials</a>
 
   <div class="toc-divider">
     <div class="sidebar-title">RESULTS</div>
   </div>
-  <a href="#answers"><span class="dot" style="background:var(--green)"></span> Recovered Intel</a>
+  <a href="#answers"><span class="dot" style="background:var(--accent)"></span> Recovered Intel</a>
   <a href="#tools"><span class="dot" style="background:var(--cyan)"></span> Tools Used</a>
   <a href="#takeaways"><span class="dot" style="background:var(--yellow)"></span> Key Takeaways</a>
   <a href="#refs"><span class="dot" style="background:var(--text-dim)"></span> References</a>
@@ -1058,7 +1057,7 @@ config redirect          <span class="cm"># NAS / storage</span>
 <footer>
   Silicon Data Sleuthing — CTF Writeup
   &nbsp;·&nbsp;
-  <span style="color:var(--green)">0xHACK CTF</span>
+  <span style="color:var(--accent)">0xh1tm4n CTF</span>
   &nbsp;·&nbsp;
   <a href="cheatsheet.html" style="color:var(--text-dim);text-decoration:none">← Back to Cheatsheet</a>
 </footer>
