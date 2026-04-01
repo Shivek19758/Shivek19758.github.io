@@ -3,207 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>0xh1tm4n CTF</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fira+Code:wght@300;400;500&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<title>0xh1tm4n</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-
-/* ─── LANDING HERO ─── */
-.landing-hero {
-  min-height: calc(100vh - 57px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  padding: 3rem 2rem 5rem;
+.landing {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 80px 2rem 60px;
 }
 
-.landing-center {
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  max-width: 900px;
-  width: 100%;
-  opacity: 0;
-  animation: fadeUp 0.6s 0.1s forwards;
-}
-
-/* ─── TAG LINE ─── */
-.landing-tag {
+.landing-hello {
   font-family: 'Fira Code', monospace;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-dim);
-  letter-spacing: 5px;
-  margin-bottom: 22px;
-  display: inline-block;
+  margin-bottom: 16px;
 }
+.landing-hello span { color: var(--accent); }
 
-/* ─── TITLE ─── */
 .landing-title {
-  font-family: 'Space Mono', 'Fira Code', monospace;
-  font-size: clamp(3.2rem, 10vw, 6.5rem);
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(2rem, 6vw, 3rem);
   font-weight: 700;
   color: var(--text-bright);
-  letter-spacing: 6px;
-  line-height: 1;
-  margin-bottom: 18px;
-}
-.landing-title em {
-  color: var(--accent);
-  font-style: normal;
+  line-height: 1.2;
+  margin-bottom: 20px;
 }
 
-/* ─── SUBTITLE ─── */
-.landing-sub {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 13px;
-  font-weight: 300;
-  color: var(--text-dim);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin-bottom: 60px;
+.landing-bio {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 40px;
 }
+.landing-bio strong { color: var(--text-bright); }
 
-/* ─── NAV CARDS ─── */
-.nav-cards {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.nav-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 36px 32px;
-  width: 340px;
-  text-decoration: none;
+/* ─── SECTION LINKS ─── */
+.landing-sections {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 13px;
-  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-  position: relative;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
   overflow: hidden;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
-/* Top accent line */
-.nav-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  opacity: 0.5;
-  transition: opacity 0.25s;
-}
-
-/* — CHEATSHEET card (accent blue) — */
-.cs-card::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-.cs-card:hover {
-  transform: translateY(-7px);
-  border-color: var(--accent);
-  box-shadow: 0 12px 30px rgba(37,99,235,0.1);
-}
-.cs-card:hover::before { opacity: 1; }
-
-/* — WRITEUPS card (cyan) — */
-.wu-card::before { background: linear-gradient(90deg, var(--cyan), #0e7490); }
-.wu-card:hover {
-  transform: translateY(-7px);
-  border-color: var(--cyan);
-  box-shadow: 0 12px 30px rgba(8,145,178,0.1);
-}
-.wu-card:hover::before { opacity: 1; }
-
-/* Card components */
-.card-cat {
-  font-family: 'Fira Code', monospace;
-  font-size: 9px;
-  letter-spacing: 3px;
-  padding: 3px 9px;
-  border: 1px solid;
-  border-radius: 2px;
-  text-transform: uppercase;
-}
-.cs-card .card-cat { color: var(--accent);  border-color: #bfdbfe; background: #eef2ff; }
-.wu-card .card-cat { color: var(--cyan);    border-color: #a5f3fc; background: #ecfeff; }
-
-.card-icon {
-  font-size: 30px;
-  line-height: 1;
-}
-
-.card-title {
-  font-family: 'Space Mono', 'Fira Code', monospace;
-  font-size: 1.55rem;
-  font-weight: 700;
-  letter-spacing: 3px;
-  line-height: 1;
-}
-.cs-card .card-title { color: var(--accent); }
-.wu-card .card-title { color: var(--cyan); }
-
-.card-count {
-  font-family: 'Fira Code', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  margin-top: -4px;
-}
-
-.card-desc {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 13px;
-  font-weight: 300;
-  color: var(--text-dim);
-  line-height: 1.8;
-  flex: 1;
-}
-
-.card-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--border);
-}
-
-.card-tags {
-  font-family: 'Fira Code', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 1.5px;
-  opacity: 0.55;
-  line-height: 1.9;
-}
-
-.card-cta {
-  font-family: 'Fira Code', monospace;
-  font-size: 11px;
-  letter-spacing: 2px;
+.landing-link {
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin-top: 2px;
-  transition: gap 0.2s;
+  gap: 16px;
+  padding: 20px 24px;
+  text-decoration: none;
+  transition: background 0.15s;
+  border-bottom: 1px solid var(--border);
 }
-.cs-card .card-cta { color: var(--accent); }
-.wu-card .card-cta { color: var(--cyan);  }
-.nav-card:hover .card-cta { gap: 12px; }
+.landing-link:last-child { border-bottom: none; }
+.landing-link:hover { background: var(--bg); }
 
-/* ─── RESPONSIVE ─── */
-@media (max-width: 760px) {
-  .nav-cards { flex-direction: column; align-items: center; }
-  .nav-card  { width: 100%; max-width: 360px; }
-  .landing-title { font-size: 3rem; }
+.landing-link-icon {
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.landing-link.cs .landing-link-icon { background: #eef2ff; }
+.landing-link.wu .landing-link-icon { background: #ecfeff; }
+
+.landing-link-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-link-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 2px;
+}
+
+.landing-link-desc {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.landing-link-arrow {
+  color: var(--border);
+  font-size: 18px;
+  transition: color 0.15s, transform 0.15s;
+}
+.landing-link:hover .landing-link-arrow {
+  color: var(--text-dim);
+  transform: translateX(3px);
+}
+
+/* ─── CATEGORIES PREVIEW ─── */
+.landing-cats {
+  margin-top: 32px;
+}
+.landing-cats-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+.landing-cats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.landing-cat {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.landing-cat:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .landing { padding: 48px 1.5rem 40px; }
+  .landing-link { padding: 16px 18px; gap: 12px; }
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="logo">0x<span>h1tm4n</span></div>
   <nav>
@@ -212,56 +152,54 @@
   </nav>
 </header>
 
-<!-- LANDING HERO -->
-<div class="landing-hero">
+<div class="landing">
 
-  <div class="landing-center">
-    <div class="landing-tag">// CTF ARSENAL &mdash; CAPTURE THE FLAG REFERENCE</div>
-    <h1 class="landing-title">0x<em>h1tm4n</em></h1>
-    <p class="landing-sub">Your field guide to Capture The Flag</p>
+  <div class="landing-hello">0xh1tm4n<span>@ctf</span> ~$</div>
+  <h1 class="landing-title">Capture The Flag<br>Reference & Writeups</h1>
+  <p class="landing-bio">A collection of <strong>400+ commands, tools, and techniques</strong> across 10 CTF categories, plus detailed step-by-step writeups of solved challenges.</p>
 
-    <div class="nav-cards">
+  <div class="landing-sections">
+    <a href="cheatsheet.html" class="landing-link cs">
+      <div class="landing-link-icon">⌨</div>
+      <div class="landing-link-text">
+        <div class="landing-link-title">Cheatsheet</div>
+        <div class="landing-link-desc">Commands, payloads, and techniques — web, pwn, forensics, crypto, and more.</div>
+      </div>
+      <div class="landing-link-arrow">→</div>
+    </a>
+    <a href="writeups.html" class="landing-link wu">
+      <div class="landing-link-icon">📝</div>
+      <div class="landing-link-text">
+        <div class="landing-link-title">Writeups</div>
+        <div class="landing-link-desc">Step-by-step walkthroughs of solved CTF challenges with full methodology.</div>
+      </div>
+      <div class="landing-link-arrow">→</div>
+    </a>
+  </div>
 
-      <!-- CHEATSHEET -->
-      <a href="cheatsheet.html" class="nav-card cs-card">
-        <div class="card-cat">QUICK REFERENCE</div>
-        <div class="card-icon">⌨</div>
-        <div class="card-title">CHEATSHEET</div>
-        <div class="card-count">// 400+ COMMANDS &amp; TECHNIQUES</div>
-        <p class="card-desc">Commands, tools, payloads, and techniques across every major CTF category. Fast lookup, zero fluff.</p>
-        <div class="card-divider"></div>
-        <div class="card-tags">
-          WEB &nbsp;·&nbsp; FORENSICS &nbsp;·&nbsp; PWN &nbsp;·&nbsp; RE &nbsp;·&nbsp; CRYPTO<br>
-          NETWORK &nbsp;·&nbsp; STEGO &nbsp;·&nbsp; OSINT &nbsp;·&nbsp; HARDWARE
-        </div>
-        <div class="card-cta">OPEN CHEATSHEET →</div>
-      </a>
-
-      <!-- WRITEUPS -->
-      <a href="writeups.html" class="nav-card wu-card">
-        <div class="card-cat">WALKTHROUGHS</div>
-        <div class="card-icon">📝</div>
-        <div class="card-title">WRITEUPS</div>
-        <div class="card-count">// STEP-BY-STEP BREAKDOWNS</div>
-        <p class="card-desc">Detailed technical walkthroughs of solved CTF challenges. Learn the methodology, not just the answer.</p>
-        <div class="card-divider"></div>
-        <div class="card-tags">
-          FORENSICS &nbsp;·&nbsp; FIRMWARE &nbsp;·&nbsp; NETWORK<br>
-          REVERSE ENGINEERING &nbsp;·&nbsp; CRYPTO
-        </div>
-        <div class="card-cta">BROWSE WRITEUPS →</div>
-      </a>
-
+  <div class="landing-cats">
+    <div class="landing-cats-label">// CATEGORIES</div>
+    <div class="landing-cats-grid">
+      <a href="cheatsheet.html#web" class="landing-cat">WEB</a>
+      <a href="cheatsheet.html#forensics" class="landing-cat">FORENSICS</a>
+      <a href="cheatsheet.html#pwn" class="landing-cat">PWN</a>
+      <a href="cheatsheet.html#re" class="landing-cat">REV</a>
+      <a href="cheatsheet.html#crypto" class="landing-cat">CRYPTO</a>
+      <a href="cheatsheet.html#network" class="landing-cat">NETWORK</a>
+      <a href="cheatsheet.html#stego" class="landing-cat">STEGO</a>
+      <a href="cheatsheet.html#osint" class="landing-cat">OSINT</a>
+      <a href="cheatsheet.html#hardware" class="landing-cat">HARDWARE</a>
     </div>
   </div>
+
 </div>
 
 <footer>
-  0xh1tm4n CTF
+  0xh1tm4n
   &nbsp;·&nbsp;
-  <a href="cheatsheet.html">Cheatsheet</a>
+  <a href="cheatsheet.html">cheatsheet</a>
   &nbsp;·&nbsp;
-  <a href="writeups.html">Writeups</a>
+  <a href="writeups.html">writeups</a>
 </footer>
 
 <script src="script.js"></script>
