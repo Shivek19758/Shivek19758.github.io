@@ -85,11 +85,11 @@
 
 .writeup-card:hover { transform: translateY(-5px); }
 
-.writeup-card[data-category="FORENSICS"]:hover { border-color: #16a34a; box-shadow: 0 8px 24px rgba(22,163,74,0.1); }
-.writeup-card[data-category="PWN"]:hover        { border-color: #dc2626; box-shadow: 0 8px 24px rgba(220,38,38,0.1); }
-.writeup-card[data-category="WEB"]:hover        { border-color: #2563eb; box-shadow: 0 8px 24px rgba(37,99,235,0.1); }
-.writeup-card[data-category="CRYPTO"]:hover     { border-color: #ca8a04; box-shadow: 0 8px 24px rgba(202,138,4,0.1); }
-.writeup-card[data-category="RE"]:hover         { border-color: #7c3aed; box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
+.writeup-card[data-category="FORENSICS"]:hover { border-color: #4ade80; box-shadow: 0 8px 24px rgba(74,222,128,0.15); }
+.writeup-card[data-category="PWN"]:hover        { border-color: #f87171; box-shadow: 0 8px 24px rgba(248,113,113,0.15); }
+.writeup-card[data-category="WEB"]:hover        { border-color: #6c8cff; box-shadow: 0 8px 24px rgba(108,140,255,0.15); }
+.writeup-card[data-category="CRYPTO"]:hover     { border-color: #fbbf24; box-shadow: 0 8px 24px rgba(251,191,36,0.15); }
+.writeup-card[data-category="RE"]:hover         { border-color: #c084fc; box-shadow: 0 8px 24px rgba(192,132,252,0.15); }
 
 /* Card header band */
 .wc-header {
@@ -99,11 +99,11 @@
   justify-content: space-between;
   border-bottom: 1px solid;
 }
-.wc-header.forensics { background: #f0fdf4; border-color: #bbf7d0; }
-.wc-header.pwn       { background: #fef2f2; border-color: #fecaca; }
-.wc-header.web       { background: #eef2ff; border-color: #bfdbfe; }
-.wc-header.crypto    { background: #fefce8; border-color: #fde68a; }
-.wc-header.re        { background: #f5f3ff; border-color: #ddd6fe; }
+.wc-header.forensics { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.2); }
+.wc-header.pwn       { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.2); }
+.wc-header.web       { background: rgba(108,140,255,0.08); border-color: rgba(108,140,255,0.2); }
+.wc-header.crypto    { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.2); }
+.wc-header.re        { background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.2); }
 
 .wc-cat {
   font-family: 'Fira Code', monospace;
@@ -111,11 +111,11 @@
   letter-spacing: 2px;
   font-weight: bold;
 }
-.forensics .wc-cat { color: #16a34a; }
-.pwn       .wc-cat { color: #dc2626; }
-.web       .wc-cat { color: #2563eb; }
-.crypto    .wc-cat { color: #ca8a04; }
-.re        .wc-cat { color: #7c3aed; }
+.forensics .wc-cat { color: #4ade80; }
+.pwn       .wc-cat { color: #f87171; }
+.web       .wc-cat { color: #6c8cff; }
+.crypto    .wc-cat { color: #fbbf24; }
+.re        .wc-cat { color: #c084fc; }
 
 .wc-diff {
   font-family: 'Fira Code', monospace;
@@ -125,9 +125,9 @@
   border: 1px solid;
   border-radius: 2px;
 }
-.wc-diff.easy   { color: #16a34a; border-color: #86efac; }
-.wc-diff.medium { color: var(--yellow); border-color: #fde047; }
-.wc-diff.hard   { color: var(--red); border-color: #fca5a5; }
+.wc-diff.easy   { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+.wc-diff.medium { color: var(--yellow); border-color: rgba(251,191,36,0.3); }
+.wc-diff.hard   { color: var(--red); border-color: rgba(248,113,113,0.3); }
 
 /* Card body */
 .wc-body {
@@ -157,14 +157,14 @@
   align-items: center;
   flex-wrap: wrap;
 }
-.wc-meta span { opacity: 0.6; }
-.wc-meta span:nth-child(even) { opacity: 0.25; }
+.wc-meta span { opacity: 0.8; }
+.wc-meta span:nth-child(even) { opacity: 0.4; }
 
 .wc-desc {
   font-family: 'Exo 2', sans-serif;
   font-size: 13px;
-  font-weight: 300;
-  color: var(--text-dim);
+  font-weight: 400;
+  color: var(--text);
   line-height: 1.8;
   flex: 1;
 }

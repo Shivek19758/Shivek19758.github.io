@@ -30,8 +30,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
 }
@@ -94,11 +94,11 @@
   letter-spacing: 2px;
   text-transform: uppercase;
 }
-.meta-badge.green  { border-color: #86efac; color: #16a34a; background: #f0fdf4; }
-.meta-badge.yellow { border-color: #fde047; color: #ca8a04; background: #fefce8; }
-.meta-badge.cyan   { border-color: #67e8f9; color: #0891b2; background: #ecfeff; }
-.meta-badge.orange { border-color: #fdba74; color: #ea580c; background: #fff7ed; }
-.meta-badge.purple { border-color: #c4b5fd; color: #7c3aed; background: #f5f3ff; }
+.meta-badge.green  { border-color: rgba(74,222,128,0.3); color: #4ade80; background: rgba(74,222,128,0.08); }
+.meta-badge.yellow { border-color: rgba(251,191,36,0.3); color: #fbbf24; background: rgba(251,191,36,0.08); }
+.meta-badge.cyan   { border-color: rgba(34,211,238,0.3); color: #22d3ee; background: rgba(34,211,238,0.08); }
+.meta-badge.orange { border-color: rgba(251,146,60,0.3); color: #fb923c; background: rgba(251,146,60,0.08); }
+.meta-badge.purple { border-color: rgba(192,132,252,0.3); color: #c084fc; background: rgba(192,132,252,0.08); }
 .meta-sep { color: var(--text-dim); opacity: 0.25; font-family: 'Fira Code', monospace; }
 
 /* ─── BLOG LAYOUT ─── */
@@ -255,10 +255,10 @@
   border-left: 3px solid var(--cyan);
   border-radius: 0 3px 3px 0;
   margin: 14px 0;
-  background: #ecfeff;
-  border-top: 1px solid #cffafe;
-  border-right: 1px solid #cffafe;
-  border-bottom: 1px solid #cffafe;
+  background: rgba(34,211,238,0.06);
+  border-top: 1px solid rgba(34,211,238,0.15);
+  border-right: 1px solid rgba(34,211,238,0.15);
+  border-bottom: 1px solid rgba(34,211,238,0.15);
 }
 .callout-title {
   font-family: 'Fira Code', monospace;
@@ -275,10 +275,10 @@
 }
 .callout.warn {
   border-left-color: var(--red);
-  border-top-color: #fecaca;
-  border-right-color: #fecaca;
-  border-bottom-color: #fecaca;
-  background: #fef2f2;
+  border-top-color: rgba(248,113,113,0.15);
+  border-right-color: rgba(248,113,113,0.15);
+  border-bottom-color: rgba(248,113,113,0.15);
+  background: rgba(248,113,113,0.06);
 }
 .callout.warn .callout-title { color: var(--red); }
 
@@ -307,7 +307,7 @@
   font-family: 'Fira Code', monospace;
   font-size: 12px;
   line-height: 1.9;
-  background: #f0ede6;
+  background: var(--bg2);
   border: 1px solid var(--border);
   border-left: 3px solid var(--cyan);
   padding: 18px 22px;
@@ -315,8 +315,8 @@
   overflow-x: auto;
   white-space: pre;
 }
-.tree-dir  { color: #0891b2; }
-.tree-hi   { color: #ca8a04; }
+.tree-dir  { color: #22d3ee; }
+.tree-hi   { color: #fbbf24; }
 .tree-cmt  { color: var(--text-dim); opacity: 0.6; font-style: italic; }
 
 /* ─── LAYER COMPARISON TABLE ─── */
@@ -326,7 +326,7 @@
 .answers-box {
   background: var(--panel);
   border: 1px solid var(--accent);
-  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  box-shadow: 0 2px 12px rgba(108,140,255,0.15);
   padding: 28px 32px;
   margin: 20px 0;
   border-radius: 6px;
@@ -344,7 +344,7 @@
   display: flex;
   gap: 16px;
   padding: 11px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid var(--border);
   align-items: flex-start;
   flex-wrap: wrap;
 }
@@ -416,7 +416,7 @@
   display: flex;
   gap: 14px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
 .ref-item:last-child { border-bottom: none; }
@@ -472,12 +472,8 @@
   <div class="logo">0x<span>h1tm4n</span></div>
   <nav>
     <a href="index.html">HOME</a>
-    <a href="cheatsheet.html#forensics" class="active">FORENSICS</a>
-    <a href="cheatsheet.html#web">WEB</a>
-    <a href="cheatsheet.html#pwn">PWN</a>
-    <a href="cheatsheet.html#re">REV</a>
-    <a href="cheatsheet.html#crypto">CRYPTO</a>
-    <a href="cheatsheet.html#network">NETWORK</a>
+    <a href="cheatsheet.html">CHEATSHEET</a>
+    <a href="writeups.html" class="active">WRITEUPS</a>
   </nav>
 </header>
 
